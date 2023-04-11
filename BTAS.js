@@ -496,14 +496,14 @@ function CBAlertHandler() {
     registerExceptionMenu();
 
     // Filter page: audio control registration and regular issues table update
-    if ((window.location.href.includes('filter=15200') || window.location.href.includes('filter=20404')) && !window.location.href.includes('MSS')) {
+    if (window.location.href.includes('filter=15200') && !window.location.href.includes('MSS')) {
         console.log('#### Code includes filter run ####');
         const BellControls = createBellControls();
 
         setInterval(() => {
             $('.aui-button.aui-button-primary.search-button').click();
             setTimeout(checkupdate(BellControls), 5000);
-        }, 10000);
+        }, 180000);
         setInterval(() => {
             notifyKey = [];
             window.location.href = 'https://caas.pwchk.com/issues/?filter=15200';
