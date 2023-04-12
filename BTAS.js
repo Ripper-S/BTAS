@@ -361,11 +361,14 @@ function MDEAlertHandler() {
         alert(alertMsg);
     }
     function openMDE() {
+        let MDEURL = "";
         for (const info of alertInfo) {
             const { id } = info;
-            let MDEURL = `https://security.microsoft.com/alerts/${id}\n`;
-            alert(MDEURL);
+            if (id) {
+                MDEURL += `https://security.microsoft.com/alerts/${id}\n`;
+            }
         }
+        alert(MDEURL);
     }
     addButton('generateDescription', 'Description', generateDescription);
     addButton('openMDE', 'MDE', openMDE);
@@ -479,11 +482,14 @@ function CBAlertHandler() {
         alert(alertMsg);
     };
     function openCB() {
+        let CBURL = "";
         for (const info of alertInfo) {
             const { CBlink } = info;
-            let CBURL = `${CBlink}\n`;
-            alert(CBURL);
+            if (CBlink) {
+                CBURL += `${CBlink}\n`;
+            }
         }
+        alert(CBURL);
     }
     addButton('generateDescription', 'Description', generateDescription);
     addButton('openCB', 'CB', openCB);
