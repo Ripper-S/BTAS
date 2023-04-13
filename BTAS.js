@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         BTAS
 // @namespace    http://tampermonkey.net/
-// @version      1.0.3
+// @version      1.0.5
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
+// @updateURL    https://greasyfork.org/scripts/463908-btas
 // @match        https://caas.pwchk.com/*
 // @icon         https://www.google.com/s2/favicons?domain=pwchk.com
 // @require      https://code.jquery.com/jquery-3.6.4.min.js
