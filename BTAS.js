@@ -320,7 +320,7 @@ function MDEAlertHandler() {
         const alertInfo = rawLog.reduce((acc, log) => {
             try {
                 const { mde } = JSON.parse(log);
-                const { title, id, computerDnsName, relatedUser, loggedOnUsers, evidence } = mde;
+                const { title, id, computerDnsName, relatedUser, evidence } = mde;
                 const alert = { title, id, computerDnsName };
                 const userName = relatedUser ? relatedUser.userName : "N/A";
                 let extrainfo = "";
