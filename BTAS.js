@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BTAS
 // @namespace    http://tampermonkey.net/
-// @version      1.0.8
+// @version      1.1.0
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
