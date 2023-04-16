@@ -5,7 +5,7 @@
 **BTAS** is being developed by Barry & Jack
 
 
-## Difference: 蓝队增强_0.93 vs BTAS_v1.0.1
+## Difference: 蓝队增强 & BTAS
 
 ### 代码架构和风格
 - 代码风格：使用ES6（ECMAScript 6）新语言特性和语法替换老版本用法；使用jQuery替换JavaScript原生函数来操作 HTML 文档、处理事件，代码整体变得简洁优雅
@@ -46,6 +46,9 @@
 ### Configuration
 
 ### How to use
+You can use Greasy Fork to install and update BTAS scripts, as follows:
+
+https://greasyfork.org/en/scripts/463908-btas
 
 
 ## Contribution
