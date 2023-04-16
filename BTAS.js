@@ -31,7 +31,16 @@ function registerSearchMenu() {
         GM_registerMenuCommand(engine.name, () => {
             const selectedText = window.getSelection().toString();
             const searchURL = engine.url.replace('%s', selectedText);
-            selectedText.length === 0 ? alert('No text selected') : window.open(searchURL, '_blank');
+            if (selectedText.length === 0) {
+                AJS.flag({
+                    type: 'error',
+                    title: 'No text selected',
+                    body: 'Please select some text and try again',
+                    close: 'auto'
+                });
+            } else {
+                window.open(searchURL, '_blank');
+            }
         });
     });
 }
@@ -40,24 +49,37 @@ function registerSearchMenu() {
  * Add Exception: adds the currently selected text to an exception list stored in local storage
  * Clear Exception: clears the exception list from local storage
  */
-const exceptionKey = localStorage.getItem('exceptionKey')?.split(',') || [];
-const notifyKey = [...exceptionKey];
+let exceptionKey = localStorage.getItem('exceptionKey')?.split(',') || [];
+let notifyKey = [...exceptionKey];
 function registerExceptionMenu() {
     console.log('#### Code registerExceptionMenu run ####');
     GM_registerMenuCommand("Add Exception", () => {
     const selection = window.getSelection().toString().trim();
     if (!selection) {
-        return alert('No text selected');
+        AJS.flag({
+            type: 'error',
+            title: 'No Issue Key selected',
+            close: 'auto'
+        });
+        return;
     }
     exceptionKey.push(selection);
     localStorage.setItem("exceptionKey", exceptionKey.toString());
-    alert('Added successfully');
+        AJS.flag({
+            type: 'success',
+            title: `Added <strong>${selection}</strong> successfully`,
+            close: 'auto'
+        });
     });
 
     GM_registerMenuCommand("Clear Exception", () => {
         localStorage.setItem("exceptionKey", "");
         exceptionKey = notifyKey = [];
-        alert('Cleared successfully');
+        AJS.flag({
+            type: 'success',
+            title: 'Cleared All Issue Key',
+            close: 'auto'
+        });
     });
 }
 
@@ -191,7 +213,12 @@ function cortexAlertHandler() {
         // # Add a click event listener to the "Edit" button for ESF tickets
         if (orgName.includes('esf')) {
             $('#edit-issue').on('click', () => {
-                alert('ESF ticket: Please escalated according to the Label tags and document!!!\nhttp://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapshareButtong');
+                AJS.flag({
+                    type: 'warning',
+                    title: 'ESF ticket',
+                    body: 'Please escalated according to the Label tags and document!!!<br>http://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapshareButtong',
+                    close: 'manual'
+                });
             });
         }
         return { orgName, orgNavigator, rawLog };
@@ -274,7 +301,11 @@ function cortexAlertHandler() {
                 }
                 window.open(cardURL, '_blank');
             } else {
-                alert(`There is no ${orgName} Navigator on Cortex`);
+                AJS.flag({
+                    type: 'error',
+                    body: `There is no <strong>${orgName}</strong> Navigator on Cortex`,
+                    close: 'auto'
+                });
             }
         }
     }
@@ -285,7 +316,11 @@ function cortexAlertHandler() {
                 let timelineURL;
                 switch (source) {
                     case 'Correlation':
-                        alert(`Source of the Alert is ${source}, There is no Timeline on Cortex`);
+                        AJS.flag({
+                            type: 'error',
+                            body: `Source of the Alert is <strong>${source}</strong>, There is no Timeline on Cortex`,
+                            close: 'auto'
+                        });
                         break;
                     default:
                         timelineURL = `${orgNavigator}forensic-timeline/alert_id/${alert_id}`;
@@ -293,7 +328,11 @@ function cortexAlertHandler() {
                 }
                 timelineURL && window.open(timelineURL, '_blank');
             } else {
-                alert(`There is no ${orgName} Navigator on Cortex`);
+                AJS.flag({
+                    type: 'error',
+                    body: `There is no <strong>${orgName}</strong> Navigator on Cortex`,
+                    close: 'auto'
+                });
             }
         }
     }
@@ -310,7 +349,12 @@ function MDEAlertHandler() {
         // # Add a click event listener to the "Edit" button for LSH-HK tickets
         if (orgName.includes('lsh-hk')) {
             $('#edit-issue').on('click', () => {
-                alert('LSH-HK ticket: Please escalated according to the Label tags and document!!!\nhttp://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk');
+                AJS.flag({
+                    type: 'warning',
+                    title: 'LSH-HK ticket',
+                    body: 'Please escalated according to the Label tags and document!!!<br>http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
+                    close: 'manual'
+                });
             });
         }
         return { orgName, rawLog };
@@ -371,7 +415,12 @@ function MDEAlertHandler() {
                 MDEURL += `https://security.microsoft.com/alerts/${id}\n`;
             }
         }
-        alert(MDEURL);
+        AJS.flag({
+            type: 'info',
+            title: 'MDE URL:',
+            body: `${MDEURL}`,
+            close: 'manual'
+        });
     }
     addButton('generateDescription', 'Description', generateDescription);
     addButton('openMDE', 'MDE', openMDE);
@@ -441,7 +490,12 @@ function CBAlertHandler() {
         // # Add a click event listener to the "Edit" button for swireproperties tickets
         if (orgName.includes('swireproperties')) {
             $('#edit-issue').on('click', () => {
-                alert('swireproperties ticket: Please escalated according to the group, hostname value, Check if additional Participants need to be added through HK_MSS_SOP.doc !!!');
+                AJS.flag({
+                    type: 'warning',
+                    title: 'swireproperties ticket',
+                    body: 'Please escalated according to the group, hostname value,<br>Check if additional Participants need to be added through HK_MSS_SOP.doc !!!',
+                    close: 'manual'
+                });
             });
         }
         return { orgName, rawLog };
@@ -492,7 +546,12 @@ function CBAlertHandler() {
                 CBURL += `${CBlink}\n`;
             }
         }
-        alert(CBURL);
+        AJS.flag({
+            type: 'info',
+            title: 'CB URL:',
+            body: `${CBURL}`,
+            close: 'manual'
+        });
     }
     addButton('generateDescription', 'Description', generateDescription);
     addButton('openCB', 'CB', openCB);
