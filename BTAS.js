@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BTAS
 // @namespace    http://tampermonkey.net/
-// @version      1.1.0
+// @version      1.2.1
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
@@ -16,6 +16,23 @@
 var $ = window.jQuery;
 
 
+/**
+ * This function creates and displays a flag using AJS.flag function
+ * @param {string} type - The type of flag, can be one of the following: "success", "info", "warning", "error"
+ * @param {string} title - The title of the flag
+ * @param {string} body - The content/body of the flag
+ * @param {string} close - Indicates whether to display a close button on the flag or not
+*/
+function showFlag(type, title, body, close) {
+    AJS.flag({
+        type: type,
+        title: title,
+        body: body,
+        close: close
+    });
+}
+
+  
 /**
  * This function registers a Tampermonkey search menu command
  * @param {Array} searchEngines - Search engines array containing the Jira, VT, AbuseIPDB
@@ -32,12 +49,7 @@ function registerSearchMenu() {
             const selectedText = window.getSelection().toString();
             const searchURL = engine.url.replace('%s', selectedText);
             if (selectedText.length === 0) {
-                AJS.flag({
-                    type: 'error',
-                    title: 'No text selected',
-                    body: 'Please select some text and try again',
-                    close: 'auto'
-                });
+                showFlag('error', 'No text selected', 'Please select some text and try again', 'auto');
             } else {
                 window.open(searchURL, '_blank');
             }
@@ -56,41 +68,29 @@ function registerExceptionMenu() {
     GM_registerMenuCommand("Add Exception", () => {
     const selection = window.getSelection().toString().trim();
     if (!selection) {
-        AJS.flag({
-            type: 'error',
-            title: 'No Issue Key selected',
-            close: 'auto'
-        });
+        showFlag('error', 'No Issue Key selected', '', 'auto');
         return;
     }
     exceptionKey.push(selection);
     localStorage.setItem("exceptionKey", exceptionKey.toString());
-        AJS.flag({
-            type: 'success',
-            title: `Added <strong>${selection}</strong> successfully`,
-            close: 'auto'
-        });
+        showFlag('success', '', `Added <strong>${selection}</strong> successfully`, 'auto');
     });
 
     GM_registerMenuCommand("Clear Exception", () => {
         localStorage.setItem("exceptionKey", "");
         exceptionKey = notifyKey = [];
-        AJS.flag({
-            type: 'success',
-            title: 'Cleared All Issue Key',
-            close: 'auto'
-        });
+        showFlag('success', 'Cleared All Issue Key', '', 'auto');
     });
 }
 
 
 /**
  * This function creates audio and checkbox controls and adds them to the Jira share button's parent node
- * @returns {Object} Object containing references to the audio control and audio checkbox, keep checkbox
+ * @returns {Object} Object containing references to the audio control and audio checkbox, keep checkbox, prompt checkbox
  */
 // ## In the future, the alert sound will be migrated to another server, and more fun music will be added.
-function createBellControls() {
-    console.log('#### Code createBellControls run ####');
+function createNotifyControls() {
+    console.log('#### Code createNotifyControls run ####');
     const operationsBar = $('div.saved-search-operations.operations');
     const audioControl = $('<span></span>');
 
@@ -115,16 +115,18 @@ function createBellControls() {
     }
     createAudioControl(operationsBar);
     const audioCheckbox = createCheckbox(operationsBar, 'audioNotify');
-    const keepCheckbox = createCheckbox(operationsBar, 'keepNotify');
+    const keepCheckbox = createCheckbox(operationsBar, 'keepAudio');
+    const promptCheckbox = createCheckbox(operationsBar, 'prompt');
 
-    return { audioControl, audioCheckbox, keepCheckbox };
+    return { audioControl, audioCheckbox, keepCheckbox, promptCheckbox };
 }
 /**
  * Check for updates in the issues list and play a sound if new issues are found
- * @param {Object} BellControls - Object containing the audio control, audio checkbox, keep checkbox
+ * @param {Object} NotifyControls - Object containing the audio control, audio checkbox, keep checkbox, prompt checkbox
  */
-function checkupdate(BellControls) {
+function checkupdate(NotifyControls) {
     console.log('#### Code checkupdate run ####');
+    const { audioControl, audioCheckbox, keepCheckbox, promptCheckbox } = NotifyControls;
     const table = $('tbody');
     if (!table.length) return;
 
@@ -134,15 +136,34 @@ function checkupdate(BellControls) {
         const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
         if (!notifyKey.includes(issuekey)) {
             notifyKey.push(issuekey);
-            content += `${summary}==${issuekey}\n\n`;
+            content += `${summary}==${issuekey}\n`;
         }
     });
-    const { audioControl, audioCheckbox, keepCheckbox } = BellControls;
     if (content || keepCheckbox.find('input').prop('checked')) {
         if (audioCheckbox.find('input').prop('checked')) {
             audioControl.find('audio').get(0).currentTime = 0;
             audioControl.find('audio').get(0).play();
         }
+    }
+
+    var elem = document.querySelector('.aui-banner');
+    if (elem) {
+    elem.parentNode.removeChild(elem);
+    }
+    let bannerContent = '';
+    table.find('tr').each(function() {
+        const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
+        const datetime = new Date($(this).find('.updated time').attr('datetime'));
+        const currentTime = new Date();
+        const diffMs = currentTime - datetime;
+        const diffMinutes = Math.floor(diffMs / 60000);
+        console.log(`diffMinutes: ${diffMinutes}`);
+        if (diffMinutes > 1440) {
+            bannerContent += `${issuekey}, `
+        }
+    });
+    if (bannerContent && promptCheckbox.find('input').prop('checked')) {
+        AJS.banner({body: `ticket: <strong>${bannerContent}</strong><br>has 30mins left for respond, please respond timely`});
     }
     // console.info(`#### checkupdate_end: ${notifyKey} ####`);
 }
@@ -213,12 +234,7 @@ function cortexAlertHandler() {
         // # Add a click event listener to the "Edit" button for ESF tickets
         if (orgName.includes('esf')) {
             $('#edit-issue').on('click', () => {
-                AJS.flag({
-                    type: 'warning',
-                    title: 'ESF ticket',
-                    body: 'Please escalated according to the Label tags and document!!!<br>http://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapshareButtong',
-                    close: 'manual'
-                });
+                showFlag('warning', 'ESF ticket', 'Please escalated according to the Label tags and document!!!<br>http://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapshareButtong', 'manual');
             });
         }
         return { orgName, orgNavigator, rawLog };
@@ -301,11 +317,7 @@ function cortexAlertHandler() {
                 }
                 window.open(cardURL, '_blank');
             } else {
-                AJS.flag({
-                    type: 'error',
-                    body: `There is no <strong>${orgName}</strong> Navigator on Cortex`,
-                    close: 'auto'
-                });
+                showFlag('error', '', `There is no <strong>${orgName}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -316,11 +328,7 @@ function cortexAlertHandler() {
                 let timelineURL;
                 switch (source) {
                     case 'Correlation':
-                        AJS.flag({
-                            type: 'error',
-                            body: `Source of the Alert is <strong>${source}</strong>, There is no Timeline on Cortex`,
-                            close: 'auto'
-                        });
+                        showFlag('error', '', `Source of the Alert is <strong>${source}</strong>, There is no Timeline on Cortex`, 'auto');
                         break;
                     default:
                         timelineURL = `${orgNavigator}forensic-timeline/alert_id/${alert_id}`;
@@ -328,11 +336,7 @@ function cortexAlertHandler() {
                 }
                 timelineURL && window.open(timelineURL, '_blank');
             } else {
-                AJS.flag({
-                    type: 'error',
-                    body: `There is no <strong>${orgName}</strong> Navigator on Cortex`,
-                    close: 'auto'
-                });
+                showFlag('error', '', `There is no <strong>${orgName}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -349,12 +353,7 @@ function MDEAlertHandler() {
         // # Add a click event listener to the "Edit" button for LSH-HK tickets
         if (orgName.includes('lsh-hk')) {
             $('#edit-issue').on('click', () => {
-                AJS.flag({
-                    type: 'warning',
-                    title: 'LSH-HK ticket',
-                    body: 'Please escalated according to the Label tags and document!!!<br>http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
-                    close: 'manual'
-                });
+                showFlag('warning', 'LSH-HK ticket', 'Please escalated according to the Label tags and document!!!<br>http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk', 'manual');
             });
         }
         return { orgName, rawLog };
@@ -415,12 +414,7 @@ function MDEAlertHandler() {
                 MDEURL += `https://security.microsoft.com/alerts/${id}\n`;
             }
         }
-        AJS.flag({
-            type: 'info',
-            title: 'MDE URL:',
-            body: `${MDEURL}`,
-            close: 'manual'
-        });
+        showFlag('info', 'MDE URL:', `${MDEURL}`, 'manual');
     }
     addButton('generateDescription', 'Description', generateDescription);
     addButton('openMDE', 'MDE', openMDE);
@@ -490,12 +484,7 @@ function CBAlertHandler() {
         // # Add a click event listener to the "Edit" button for swireproperties tickets
         if (orgName.includes('swireproperties')) {
             $('#edit-issue').on('click', () => {
-                AJS.flag({
-                    type: 'warning',
-                    title: 'swireproperties ticket',
-                    body: 'Please escalated according to the group, hostname value,<br>Check if additional Participants need to be added through HK_MSS_SOP.doc !!!',
-                    close: 'manual'
-                });
+                showFlag('warning', 'swireproperties ticket', 'Please escalated according to the group, hostname value,<br>Check if additional Participants need to be added through HK_MSS_SOP.doc !!!', 'manual');
             });
         }
         return { orgName, rawLog };
@@ -546,12 +535,7 @@ function CBAlertHandler() {
                 CBURL += `${CBlink}\n`;
             }
         }
-        AJS.flag({
-            type: 'info',
-            title: 'CB URL:',
-            body: `${CBURL}`,
-            close: 'manual'
-        });
+        showFlag('info', 'CB URL:', `${CBURL}`, 'manual');
     }
     addButton('generateDescription', 'Description', generateDescription);
     addButton('openCB', 'CB', openCB);
@@ -567,11 +551,11 @@ function CBAlertHandler() {
     // Filter page: audio control registration and regular issues table update
     if ((window.location.href.includes('filter=15200') || window.location.href.includes('filter=20404')) && !window.location.href.includes('MSS')) {
         console.log('#### Code includes filter run ####');
-        const BellControls = createBellControls();
+        const NotifyControls = createNotifyControls();
 
         setInterval(() => {
             $('.aui-button.aui-button-primary.search-button').click();
-            setTimeout(checkupdate(BellControls), 5000);
+            setTimeout(checkupdate(NotifyControls), 5000);
         }, 180000);
         setInterval(() => {
             notifyKey = [];
