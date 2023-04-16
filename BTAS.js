@@ -137,7 +137,7 @@ function checkKeywords() {
     const strToCheck = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().toLowerCase();
     const matchedKeyword = keywords.find(keyword => strToCheck.includes(keyword.toLowerCase()));
     if (matchedKeyword) {
-      alert(`High Risk Keyword: ${matchedKeyword}\nPlease double-check it, and if it seems suspicious, contact L2 or TL.`);
+        AJS.banner({body: `High Risk Keyword: <strong>${matchedKeyword}</strong><br>Please double-check it, and if it seems suspicious, contact L2 or TL.`});
     }
 }
 
