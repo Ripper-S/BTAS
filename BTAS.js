@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.2.2
+// @version      1.2.3
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
@@ -21,8 +21,8 @@ var $ = window.jQuery;
  * This function creates and displays a flag using AJS.flag function
  * @param {string} type - The type of flag, can be one of the following: "success", "info", "warning", "error"
  * @param {string} title - The title of the flag
- * @param {string} body - The content/body of the flag
- * @param {string} close - Indicates whether to display a close button on the flag or not
+ * @param {string} body - The body of the flag
+ * @param {string} close - The close of flag, can be one of the following: "auto", "manual", "never"
 */
 function showFlag(type, title, body, close) {
     AJS.flag({
@@ -131,40 +131,36 @@ function checkupdate(NotifyControls) {
     const table = $('tbody');
     if (!table.length) return;
 
-    let content = '';
+    let Tickets = '';
     table.find('tr').each(function() {
         const summary = $(this).find('.summary p').text().trim();
         const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
         if (!notifyKey.includes(issuekey)) {
             notifyKey.push(issuekey);
-            content += `${summary}==${issuekey}\n`;
+            Tickets += `${summary}==${issuekey}\n`;
         }
     });
-    if (content || keepCheckbox.find('input').prop('checked')) {
+    if (Tickets || keepCheckbox.find('input').prop('checked')) {
         if (audioCheckbox.find('input').prop('checked')) {
             audioControl.find('audio').get(0).currentTime = 0;
             audioControl.find('audio').get(0).play();
         }
     }
 
-    var elem = document.querySelector('.aui-banner');
-    if (elem) {
-    elem.parentNode.removeChild(elem);
-    }
-    let bannerContent = '';
+    $('.aui-banner').remove();
+    let overdueTickets = '';
     table.find('tr').each(function() {
         const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
         const datetime = new Date($(this).find('.updated time').attr('datetime'));
         const currentTime = new Date();
         const diffMs = currentTime - datetime;
         const diffMinutes = Math.floor(diffMs / 60000);
-        console.log(`diffMinutes: ${diffMinutes}`);
-        if (diffMinutes > 1440) {
-            bannerContent += `${issuekey}, `
+        if (diffMinutes > 30) {
+            overdueTickets += `${issuekey}, `
         }
     });
-    if (bannerContent && promptCheckbox.find('input').prop('checked')) {
-        AJS.banner({body: `ticket: <strong>${bannerContent}</strong><br>has 30mins left for respond, please respond timely`});
+    if (overdueTickets && promptCheckbox.find('input').prop('checked')) {
+        AJS.banner({body: `ticket: <strong>${overdueTickets}</strong><br>30 minutes have passed since the customer responded, please handle it as soon as possible`});
     }
     // console.info(`#### checkupdate_end: ${notifyKey} ####`);
 }
