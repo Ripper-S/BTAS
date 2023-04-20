@@ -4,6 +4,8 @@
 
 **BTAS** is being developed by Barry & Jack
 
+[中文版本(Chinese version)](README.zh-cn.md)
+
 
 ## Installation & Usage
 
