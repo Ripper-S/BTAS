@@ -28,7 +28,7 @@ https://greasyfork.org/en/scripts/463908-btas
 
 - If you encounter a ticket that cannot be processed temporarily, but you don't want it to keep ringing in the filter queue, you can select the issue key with the mouse, and then click on the Tampermonkey icon in the upper right corner to call Add Exception to add an exception. Clear Exception is to clear all exceptions.
 
-### Notification Control
+### Notification Controls
 **Only supports List View (the default mode on the filter page).**
 - **audioNotify** is for turning on notification sound. It regularly refreshes the filter list and plays a notification sound only when there are new tickets that are different from the last time the list was refreshed.
 
