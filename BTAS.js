@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.2.4
+// @version      1.2.5
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
@@ -33,7 +33,7 @@ function showFlag(type, title, body, close) {
     });
 }
 
-  
+
 /**
  * This function registers a Tampermonkey search menu command
  * @param {Array} searchEngines - Search engines array containing the Jira, VT, AbuseIPDB
@@ -351,6 +351,11 @@ function MDEAlertHandler() {
         if (orgName.includes('lsh-hk')) {
             $('#edit-issue').on('click', () => {
                 showFlag('warning', 'LSH-HK ticket', 'Please escalated according to the Label tags and document!!!<br>http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk', 'manual');
+            });
+        }
+        if (orgName.includes('kerrypropshk')) {
+            $('#edit-issue').on('click', () => {
+                showFlag('warning', 'kerrypropshk ticket', 'Please copy the description to the comments for the customer', 'manual');
             });
         }
         return { orgName, rawLog };
