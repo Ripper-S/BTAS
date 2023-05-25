@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.2.5
+// @version      1.2.6
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
@@ -231,7 +231,7 @@ function cortexAlertHandler() {
         // # Add a click event listener to the "Edit" button for ESF tickets
         if (orgName.includes('esf')) {
             $('#edit-issue').on('click', () => {
-                showFlag('warning', 'ESF ticket', 'Please escalated according to the Label tags and document!!!<br>https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping', 'manual');
+                showFlag('warning', 'ESF ticket', 'Please escalated according to the Label tags and document.<br>https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping', 'manual');
             });
         }
         return { orgName, orgNavigator, rawLog };
@@ -350,13 +350,23 @@ function MDEAlertHandler() {
         // # Add a click event listener to the "Edit" button for LSH-HK tickets
         if (orgName.includes('lsh-hk')) {
             $('#edit-issue').on('click', () => {
-                showFlag('warning', 'LSH-HK ticket', 'Please escalated according to the Label tags and document!!!<br>http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk', 'manual');
+                showFlag('warning', 'LSH-HK ticket', 'Please escalated according to the Label tags and document.<br>http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk', 'manual');
             });
         }
         if (orgName.includes('kerrypropshk')) {
-            $('#edit-issue').on('click', () => {
-                showFlag('warning', 'kerrypropshk ticket', 'Please copy the description to the comments for the customer', 'manual');
-            });
+            const label = $('.labels-wrap .labels li a span').text();
+            if (label === "UnassignedGroup") {
+                $('#edit-issue').on('click', () => {
+                    showFlag('warning', 'kerrypropshk UnassignedGroup ticket', 'Please note that if the host starts with cn/sz/bj/sh, Do NOT escalate it on Jira.<br>\
+                    Instead, share the issue key and MDE link with Desen and Barry.<br>\
+                    Then, choose "Won\'t Do" as the Resolution and Resolve this issue.<br>\
+                    In the Comments, mention that the host belongs to PRC and has been handed over to the SH team for handling.', 'manual');
+                });
+            } else {
+                $('#edit-issue').on('click', () => {
+                    showFlag('warning', 'kerrypropshk ticket', 'Please copy the description to the comments for the customer', 'manual');
+                });
+            }
         }
         return { orgName, rawLog };
     }
@@ -486,7 +496,8 @@ function CBAlertHandler() {
         // # Add a click event listener to the "Edit" button for swireproperties tickets
         if (orgName.includes('swireproperties')) {
             $('#edit-issue').on('click', () => {
-                showFlag('warning', 'swireproperties ticket', 'Please escalated according to the group, hostname value,<br>Check if additional Participants need to be added through HK_MSS_SOP.doc !!!', 'manual');
+                showFlag('warning', 'swireproperties ticket', 'Please escalated according to the group, hostname value.<br>\
+                Check if additional Participants need to be added through HK_MSS_SOP.doc !!!', 'manual');
             });
         }
         return { orgName, rawLog };
@@ -567,7 +578,7 @@ function CBAlertHandler() {
 
     // Issue page: Alert Handler
     setInterval(() => {
-        if ($('#issue-content').length && !$('#generateDescription').length) {
+        if ($('#issue-content').length && !$('#generateDescription').length && !$('.aui-banner-error').length) {
             console.log('#### Code Issue page run ####');
             checkKeywords();
 
