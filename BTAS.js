@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.2.6
+// @version      1.2.7
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
@@ -243,9 +243,11 @@ function editNotify() {
     addEditonClick();
 
     function generateEditnotify() {
-        showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
+        const toolbar = $('.aui-toolbar2-primary');
+        const element = $('<div id="generateEditnotify"></div>')
+        toolbar.append(element);
     };
-    addButton('generateEditnotify', 'EditNotify', generateEditnotify);
+    generateEditnotify();
 }
 
 
