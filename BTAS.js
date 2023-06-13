@@ -183,6 +183,73 @@ function checkKeywords() {
 
 
 /**
+ * 
+ */
+function editNotify() {
+    console.log('#### Code editNotify run ####');
+    const orgNotifydict = {
+        'swireproperties': 'Please escalated according to the group, hostname value.<br>\
+        Check if additional Participants need to be added through HK_MSS_SOP.doc',
+        'esf': 'Please escalated according to the Label tags and document.<br>\
+        https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping',
+        'lsh-hk': 'Please escalated according to the Label tags and document.<br>http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
+    };
+    const DecoderName = $('#customfield_10223-val').text().trim();
+    const orgNotify = orgNotifydict[DecoderName];
+    const Labels = $('.labels-wrap .labels li a span').text();
+    const LogSource = $('#customfield_10204-val').text().trim();
+    function addEditonClick() {
+        // # Add a click event listener to the "Edit" button for esf tickets
+        if (DecoderName.includes('esf')) {
+            $('#edit-issue').on('click', () => {
+                showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
+            });
+        }
+        // # Add a click event listener to the "Edit" button for swireproperties tickets
+        if (DecoderName.includes('swireproperties')) {
+            $('#edit-issue').on('click', () => {
+                showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
+            });
+        }
+        // # Add a click event listener to the "Edit" button for lsh-hk tickets
+        if (DecoderName.includes('lsh-hk')) {
+            $('#edit-issue').on('click', () => {
+                showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
+            });
+        }
+        // # Add a click event listener to the "Edit" button for LogCollector tickets
+        if (LogSource.includes('LogCollector')) {
+            $('#edit-issue').on('click', () => {
+                showFlag('warning', 'LogCollector ticket', 'When processing a ticket containing "LogCollector" in the Log Source<br>\
+                Please do NOT escalate to the customer and contact Jones/Franky first to confirm if it is due to other reasons', 'manual');
+            });
+        }
+        // # Add a click event listener to the "Edit" button for kerrypropshk tickets
+        if (DecoderName.includes('kerrypropshk')) {
+            if (Labels === "UnassignedGroup") {
+                $('#edit-issue').on('click', () => {
+                    showFlag('warning', 'kerrypropshk UnassignedGroup ticket', 'Please note that if the host starts with cn/sz/bj/sh, Do NOT escalate it on Jira.<br>\
+                    Instead, share the issue key and MDE link with Desen and Barry.<br>\
+                    Then, choose "Won\'t Do" as the Resolution and Resolve this issue.<br>\
+                    In the Comments, mention that the host belongs to PRC and has been handed over to the SH team for handling.', 'manual');
+                });
+            } else {
+                $('#edit-issue').on('click', () => {
+                    showFlag('warning', 'kerrypropshk ticket', 'Please copy the description to the comments for the customer', 'manual');
+                });
+            }
+        }
+    }
+    addEditonClick();
+
+    function generateEditnotify() {
+        showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
+    };
+    addButton('generateEditnotify', 'EditNotify', generateEditnotify);
+}
+
+
+/**
  * Creates a new button and adds it to the DOM.
  * @param {string} id - The ID attribute for the new button element.
  * @param {string} text - The text content to display on the new button.
@@ -225,18 +292,12 @@ function cortexAlertHandler() {
         'welab': 'https://welabbank.xdr.sg.paloaltonetworks.com/'
     };
     function extractLog(orgDict) {
-        const orgName = $('#customfield_10223-val').text().trim();
-        const orgNavigator = orgDict[orgName];
+        const DecoderName = $('#customfield_10223-val').text().trim();
+        const orgNavigator = orgDict[DecoderName];
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        // # Add a click event listener to the "Edit" button for ESF tickets
-        if (orgName.includes('esf')) {
-            $('#edit-issue').on('click', () => {
-                showFlag('warning', 'ESF ticket', 'Please escalated according to the Label tags and document.<br>https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping', 'manual');
-            });
-        }
-        return { orgName, orgNavigator, rawLog };
+        return { DecoderName, orgNavigator, rawLog };
     }
-    const { orgName, orgNavigator, rawLog} = extractLog(orgDict);
+    const { DecoderName, orgNavigator, rawLog} = extractLog(orgDict);
 
     /**
      * Parse the relevant information from the raw log data
@@ -314,7 +375,7 @@ function cortexAlertHandler() {
                 }
                 window.open(cardURL, '_blank');
             } else {
-                showFlag('error', '', `There is no <strong>${orgName}</strong> Navigator on Cortex`, 'auto');
+                showFlag('error', '', `There is no <strong>${DecoderName}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -333,7 +394,7 @@ function cortexAlertHandler() {
                 }
                 timelineURL && window.open(timelineURL, '_blank');
             } else {
-                showFlag('error', '', `There is no <strong>${orgName}</strong> Navigator on Cortex`, 'auto');
+                showFlag('error', '', `There is no <strong>${DecoderName}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -345,33 +406,12 @@ function cortexAlertHandler() {
 function MDEAlertHandler() {
     console.log('#### Code MDEAlertHandler run ####');
     function extractLog() {
-        const orgName = $('#customfield_10223-val').text().trim();
+        const DecoderName = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        // # Add a click event listener to the "Edit" button for LSH-HK tickets
-        if (orgName.includes('lsh-hk')) {
-            $('#edit-issue').on('click', () => {
-                showFlag('warning', 'LSH-HK ticket', 'Please escalated according to the Label tags and document.<br>http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk', 'manual');
-            });
-        }
-        if (orgName.includes('kerrypropshk')) {
-            const label = $('.labels-wrap .labels li a span').text();
-            if (label === "UnassignedGroup") {
-                $('#edit-issue').on('click', () => {
-                    showFlag('warning', 'kerrypropshk UnassignedGroup ticket', 'Please note that if the host starts with cn/sz/bj/sh, Do NOT escalate it on Jira.<br>\
-                    Instead, share the issue key and MDE link with Desen and Barry.<br>\
-                    Then, choose "Won\'t Do" as the Resolution and Resolve this issue.<br>\
-                    In the Comments, mention that the host belongs to PRC and has been handed over to the SH team for handling.', 'manual');
-                });
-            } else {
-                $('#edit-issue').on('click', () => {
-                    showFlag('warning', 'kerrypropshk ticket', 'Please copy the description to the comments for the customer', 'manual');
-                });
-            }
-        }
-        return { orgName, rawLog };
+        return { DecoderName, rawLog };
     }
-    const { orgName, rawLog} = extractLog();
-    // console.info(`orgName: ${orgName}`);
+    const { DecoderName, rawLog} = extractLog();
+    // console.info(`DecoderName: ${DecoderName}`);
     // console.info(`rawLog: ${rawLog}`);
 
     function parseLog(rawLog) {
@@ -441,12 +481,12 @@ function HTSCAlertHandler() {
     }
 
     function extractLog() {
-        const orgName = $('#customfield_10223-val').text().trim();
+        const DecoderName = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { orgName, rawLog };
+        return { DecoderName, rawLog };
     }
-    const { orgName, rawLog} = extractLog();
-    // console.info(`orgName: ${orgName}`);
+    const { DecoderName, rawLog} = extractLog();
+    // console.info(`DecoderName: ${DecoderName}`);
     // console.info(`rawLog: ${rawLog}`);
 
     const parseLog = (rawLog) => {
@@ -491,19 +531,12 @@ function HTSCAlertHandler() {
 function CBAlertHandler() {
     console.log('#### Code CBAlertHandler run ####');
     function extractLog() {
-        const orgName = $('#customfield_10223-val').text().trim();
+        const DecoderName = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        // # Add a click event listener to the "Edit" button for swireproperties tickets
-        if (orgName.includes('swireproperties')) {
-            $('#edit-issue').on('click', () => {
-                showFlag('warning', 'swireproperties ticket', 'Please escalated according to the group, hostname value.<br>\
-                Check if additional Participants need to be added through HK_MSS_SOP.doc !!!', 'manual');
-            });
-        }
-        return { orgName, rawLog };
+        return { DecoderName, rawLog };
     }
-    const { orgName, rawLog} = extractLog();
-    // console.info(`orgName: ${orgName}`);
+    const { DecoderName, rawLog} = extractLog();
+    // console.info(`DecoderName: ${DecoderName}`);
     // console.info(`rawLog: ${rawLog}`);
 
     function parseLog(rawLog) {
@@ -579,7 +612,7 @@ function CBAlertHandler() {
     // Issue page: Alert Handler
     setInterval(() => {
         if ($('#issue-content').length && !$('#generateDescription').length && !$('.aui-banner-error').length) {
-            console.log('#### Code Issue page run ####');
+            console.log('#### Code Issue page: Alert Handler ####');
             checkKeywords();
 
             const handlers = {
@@ -593,6 +626,14 @@ function CBAlertHandler() {
             if (handler) {
                 handler();
             }
+        }
+    }, 3000);
+
+    // Issue page: Edit Notify
+    setInterval(() => {
+        if ($('#issue-content').length && !$('#generateEditnotify').length) {
+            console.log('#### Code Issue page: Edit Notify ####');
+            editNotify();
         }
     }, 3000);
 })();
