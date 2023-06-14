@@ -183,36 +183,27 @@ function checkKeywords() {
 
 
 /**
- * 
+ * This function initializes the edit notification functionality.
+ * It adds click event listeners to the "Edit" button based on certain conditions,
+ * and generates a specific HTML element for the edit notification.
  */
 function editNotify() {
     console.log('#### Code editNotify run ####');
     const orgNotifydict = {
-        'swireproperties': 'Please escalated according to the group, hostname value.<br>\
-        Check if additional Participants need to be added through HK_MSS_SOP.doc',
         'esf': 'Please escalated according to the Label tags and document.<br>\
         https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping',
-        'lsh-hk': 'Please escalated according to the Label tags and document.<br>http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
+        'swireproperties': 'Please escalated according to the group, hostname value.<br>\
+        Check if additional Participants need to be added through HK_MSS_SOP.doc',
+        'lsh-hk': 'Please escalated according to the Label tags and document.<br>\
+        http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
     };
     const DecoderName = $('#customfield_10223-val').text().trim();
     const orgNotify = orgNotifydict[DecoderName];
     const Labels = $('.labels-wrap .labels li a span').text();
     const LogSource = $('#customfield_10204-val').text().trim();
     function addEditonClick() {
-        // # Add a click event listener to the "Edit" button for esf tickets
-        if (DecoderName.includes('esf')) {
-            $('#edit-issue').on('click', () => {
-                showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
-            });
-        }
-        // # Add a click event listener to the "Edit" button for swireproperties tickets
-        if (DecoderName.includes('swireproperties')) {
-            $('#edit-issue').on('click', () => {
-                showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
-            });
-        }
-        // # Add a click event listener to the "Edit" button for lsh-hk tickets
-        if (DecoderName.includes('lsh-hk')) {
+        // # Add a click event listener to the "Edit" button
+        if (DecoderName.includes('esf') || DecoderName.includes('swireproperties') || DecoderName.includes('lsh-hk')) {
             $('#edit-issue').on('click', () => {
                 showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
             });
