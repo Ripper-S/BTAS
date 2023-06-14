@@ -6,7 +6,6 @@
 
 [中文版本(Chinese version)](README.zh-cn.md)
 
-## GIT TEST222
 ## Installation & Usage
 
 You can use Greasy Fork to install and update BTAS scripts, as follows:
