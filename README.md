@@ -6,7 +6,6 @@
 
 [中文版本(Chinese version)](README.zh-cn.md)
 
-## branch test
 
 ## Installation & Usage
 
