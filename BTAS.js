@@ -40,15 +40,24 @@ function showFlag(type, title, body, close) {
  */
 function registerSearchMenu() {
     console.log('#### Code registerSearchMenu run ####');
+    var cur_logsourceDomain = $('#customfield_10223-val').text().toString(); //Get current page's Log Source Domain field
+    cur_logsourceDomain = $.trim(cur_logsourceDomain); //trim space
+    cur_logsourceDomain = cur_logsourceDomain.replace(/\n/g, ''); //trim line break
     const searchEngines = [
-        { name: 'Jira', url: 'https://caas.pwchk.com/issues/?jql=text%20~%20%22%s%22%20ORDER%20BY%20created%20DESC' },
-        { name: 'VT', url: 'https://www.virustotal.com/gui/search/%s' },
-        { name: 'AbuseIPDB', url: 'https://www.abuseipdb.com/check/%s' }
+        {
+            name: 'Jira',
+            url: 'https://caas.pwchk.com/issues/?jql=text%20~%20%22{selectedText}%22%20and%20"Log%20Source%20Domain"%20~%20%27{cur_logsourceDomain}%27%20ORDER%20BY%20created%20DESC',
+        },
+        { name: 'VT', url: 'https://www.virustotal.com/gui/search/{selectedText}' },
+        {
+            name: 'AbuseIPDB',
+            url: 'https://www.abuseipdb.com/check/{selectedText}',
+        },
     ];
     searchEngines.forEach(engine => {
         GM_registerMenuCommand(engine.name, () => {
             const selectedText = window.getSelection().toString();
-            const searchURL = engine.url.replace('%s', selectedText);
+            const searchURL = engine.url.replace('{selectedText}', selectedText).replace('{cur_logsourceDomain}', cur_logsourceDomain);
             if (selectedText.length === 0) {
                 showFlag('error', 'No text selected', 'Please select some text and try again', 'auto');
             } else {
