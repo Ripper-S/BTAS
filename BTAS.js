@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.2.8
+// @version      1.2.9
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
@@ -40,7 +40,8 @@ function showFlag(type, title, body, close) {
  */
 function registerSearchMenu() {
     console.log('#### Code registerSearchMenu run ####');
-    const LogSourceDomain = $('#customfield_10223-val').text().trim();
+    let LogSourceDomain = "*";
+    LogSourceDomain = $('#customfield_10223-val').text().trim();
     const searchEngines = [
         {
             name: 'Jira',
