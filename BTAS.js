@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.2.7
+// @version      1.2.8
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
@@ -40,24 +40,20 @@ function showFlag(type, title, body, close) {
  */
 function registerSearchMenu() {
     console.log('#### Code registerSearchMenu run ####');
-    var cur_logsourceDomain = $('#customfield_10223-val').text().toString(); //Get current page's Log Source Domain field
-    cur_logsourceDomain = $.trim(cur_logsourceDomain); //trim space
-    cur_logsourceDomain = cur_logsourceDomain.replace(/\n/g, ''); //trim line break
+    const LogSourceDomain = $('#customfield_10223-val').text().trim();
     const searchEngines = [
         {
             name: 'Jira',
-            url: 'https://caas.pwchk.com/issues/?jql=text%20~%20%22{selectedText}%22%20and%20"Log%20Source%20Domain"%20~%20%27{cur_logsourceDomain}%27%20ORDER%20BY%20created%20DESC',
+            url: 'https://caas.pwchk.com/issues/?jql=text%20~%20%22%s%22%20AND%20' +
+            '%22Log%20Source%20Domain%22%20~%20%22%D%22%20' + 'ORDER%20BY%20created%20DESC'
         },
-        { name: 'VT', url: 'https://www.virustotal.com/gui/search/{selectedText}' },
-        {
-            name: 'AbuseIPDB',
-            url: 'https://www.abuseipdb.com/check/{selectedText}',
-        },
+        { name: 'VT', url: 'https://www.virustotal.com/gui/search/%s' },
+        { name: 'AbuseIPDB', url: 'https://www.abuseipdb.com/check/%s' }
     ];
     searchEngines.forEach(engine => {
         GM_registerMenuCommand(engine.name, () => {
             const selectedText = window.getSelection().toString();
-            const searchURL = engine.url.replace('{selectedText}', selectedText).replace('{cur_logsourceDomain}', cur_logsourceDomain);
+            const searchURL = engine.url.replace('%s', selectedText).replace('%D', LogSourceDomain);
             if (selectedText.length === 0) {
                 showFlag('error', 'No text selected', 'Please select some text and try again', 'auto');
             } else {
@@ -206,15 +202,15 @@ function editNotify() {
         'lsh-hk': 'Please escalated according to the Label tags and document.<br>\
         http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
     };
-    const DecoderName = $('#customfield_10223-val').text().trim();
-    const orgNotify = orgNotifydict[DecoderName];
+    const LogSourceDomain = $('#customfield_10223-val').text().trim();
+    const orgNotify = orgNotifydict[LogSourceDomain];
     const Labels = $('.labels-wrap .labels li a span').text();
     const LogSource = $('#customfield_10204-val').text().trim();
     function addEditonClick() {
         // # Add a click event listener to the "Edit" button
-        if (DecoderName.includes('esf') || DecoderName.includes('swireproperties') || DecoderName.includes('lsh-hk')) {
+        if (LogSourceDomain.includes('esf') || LogSourceDomain.includes('swireproperties') || LogSourceDomain.includes('lsh-hk')) {
             $('#edit-issue').on('click', () => {
-                showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
+                showFlag('warning', `${LogSourceDomain} ticket`, `${orgNotify}`, 'manual');
             });
         }
         // # Add a click event listener to the "Edit" button for LogCollector tickets
@@ -225,7 +221,7 @@ function editNotify() {
             });
         }
         // # Add a click event listener to the "Edit" button for kerrypropshk tickets
-        if (DecoderName.includes('kerrypropshk')) {
+        if (LogSourceDomain.includes('kerrypropshk')) {
             if (Labels === "UnassignedGroup") {
                 $('#edit-issue').on('click', () => {
                     showFlag('warning', 'kerrypropshk UnassignedGroup ticket', 'Please note that if the host starts with cn/sz/bj/sh, Do NOT escalate it on Jira.<br>\
@@ -294,12 +290,12 @@ function cortexAlertHandler() {
         'welab': 'https://welabbank.xdr.sg.paloaltonetworks.com/'
     };
     function extractLog(orgDict) {
-        const DecoderName = $('#customfield_10223-val').text().trim();
-        const orgNavigator = orgDict[DecoderName];
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
+        const orgNavigator = orgDict[LogSourceDomain];
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { DecoderName, orgNavigator, rawLog };
+        return { LogSourceDomain, orgNavigator, rawLog };
     }
-    const { DecoderName, orgNavigator, rawLog} = extractLog(orgDict);
+    const { LogSourceDomain, orgNavigator, rawLog} = extractLog(orgDict);
 
     /**
      * Parse the relevant information from the raw log data
@@ -377,7 +373,7 @@ function cortexAlertHandler() {
                 }
                 window.open(cardURL, '_blank');
             } else {
-                showFlag('error', '', `There is no <strong>${DecoderName}</strong> Navigator on Cortex`, 'auto');
+                showFlag('error', '', `There is no <strong>${LogSourceDomain}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -396,7 +392,7 @@ function cortexAlertHandler() {
                 }
                 timelineURL && window.open(timelineURL, '_blank');
             } else {
-                showFlag('error', '', `There is no <strong>${DecoderName}</strong> Navigator on Cortex`, 'auto');
+                showFlag('error', '', `There is no <strong>${LogSourceDomain}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -408,12 +404,12 @@ function cortexAlertHandler() {
 function MDEAlertHandler() {
     console.log('#### Code MDEAlertHandler run ####');
     function extractLog() {
-        const DecoderName = $('#customfield_10223-val').text().trim();
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { DecoderName, rawLog };
+        return { LogSourceDomain, rawLog };
     }
-    const { DecoderName, rawLog} = extractLog();
-    // console.info(`DecoderName: ${DecoderName}`);
+    const { LogSourceDomain, rawLog} = extractLog();
+    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
     // console.info(`rawLog: ${rawLog}`);
 
     function parseLog(rawLog) {
@@ -483,12 +479,12 @@ function HTSCAlertHandler() {
     }
 
     function extractLog() {
-        const DecoderName = $('#customfield_10223-val').text().trim();
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { DecoderName, rawLog };
+        return { LogSourceDomain, rawLog };
     }
-    const { DecoderName, rawLog} = extractLog();
-    // console.info(`DecoderName: ${DecoderName}`);
+    const { LogSourceDomain, rawLog} = extractLog();
+    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
     // console.info(`rawLog: ${rawLog}`);
 
     const parseLog = (rawLog) => {
@@ -533,12 +529,12 @@ function HTSCAlertHandler() {
 function CBAlertHandler() {
     console.log('#### Code CBAlertHandler run ####');
     function extractLog() {
-        const DecoderName = $('#customfield_10223-val').text().trim();
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { DecoderName, rawLog };
+        return { LogSourceDomain, rawLog };
     }
-    const { DecoderName, rawLog} = extractLog();
-    // console.info(`DecoderName: ${DecoderName}`);
+    const { LogSourceDomain, rawLog} = extractLog();
+    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
     // console.info(`rawLog: ${rawLog}`);
 
     function parseLog(rawLog) {
@@ -623,8 +619,8 @@ function CBAlertHandler() {
                 'sangfor-ccom-json': HTSCAlertHandler,
                 'CarbonBlack': CBAlertHandler
             };
-            const decoderName = $('#customfield_10807-val').text().trim();
-            const handler = handlers[decoderName];
+            const DecoderName = $('#customfield_10807-val').text().trim();
+            const handler = handlers[DecoderName];
             if (handler) {
                 handler();
             }
