@@ -529,29 +529,47 @@ function HTSCAlertHandler() {
 function CBAlertHandler() {
 
     console.log('#### Code CBAlertHandler run ####');
+    const { LogSourceDomain, rawLog } = extractLog();
+    var alertInfo
+    if (LogSourceDomain == 'swireproperties') {
+        alertInfo = parseLeefLog(rawLog)
+    }
+    if (LogSourceDomain == "jetco") {
+        alertInfo = parseCefLog(rawLog)
+    }
+
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, rawLog };
     }
-    const { LogSourceDomain, rawLog } = extractLog();
-    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
-    // console.info(`rawLog: ${rawLog}`);
 
-    function parseLog(rawLog) {
+    // For Swire
+    function parseLeefLog(rawLog) {
         const alertInfo = rawLog.reduce((acc, log) => {
             const cb_log = {};
             try {
-                const log_obj = log.split("\t");
-                log_obj.forEach((log_item) => {
+                const log_obj = log.split('\t');
+                log_obj.forEach(log_item => {
                     try {
-                        const [key, value] = log_item.split("=");
+                        const [key, value] = log_item.split('=');
                         cb_log[key] = value;
                     } catch (error) {
                         console.error(`Error: ${error.message}`);
                     }
                 });
-                acc.push({ AlertTitle: cb_log.watchlist_name, HostName: cb_log.computer_name, HostIp: cb_log.interface_ip, UserName: cb_log.username, CmdLine: cb_log.cmdline, CBlink: cb_log.link_process, Filepath: cb_log.path, Sha256: cb_log.process_sha256 });
+                if (log.trim() !== '') {
+                    acc.push({
+                        AlertTitle: cb_log.watchlist_name,
+                        HostName: cb_log.computer_name,
+                        HostIp: cb_log.interface_ip,
+                        UserName: cb_log.username,
+                        CmdLine: cb_log.cmdline,
+                        CBlink: cb_log.link_process,
+                        Filepath: cb_log.path,
+                        Sha256: cb_log.process_sha256,
+                    });
+                }
             } catch (error) {
                 console.error(`Error: ${error.message}`);
             }
@@ -559,21 +577,85 @@ function CBAlertHandler() {
         }, []);
         return alertInfo;
     }
-    const alertInfo = parseLog(rawLog);
-    // console.info(`alertInfo: ${alertInfo}`);
+
+    // For Jetco and other CEF log tickets
+    function parseCefLog(rawLog) {
+        function cefToJson(cefLog) {
+            var json = {};
+            var fields = cefLog.split(' ');
+
+            for (var i = 0; i < fields.length; i++) {
+                var field = fields[i].split('=');
+                var key = field[0];
+                var value = field.slice(1).join('=');
+
+                if (value) {
+                    value = value.replace(/\\\\=/g, '=').replace(/\\\\s/g, ' ');
+
+                    if (key === 'filePath' || key === 'msg' || key === 'start' || key === 'rt') {
+                        var nextFieldIndex = i + 1;
+                        while (nextFieldIndex < fields.length && !fields[nextFieldIndex].includes('=')
+                        ) {
+                            value += ' ' + fields[nextFieldIndex];
+                            nextFieldIndex++;
+                        }
+                    }
+                    json[key] = value;
+                }
+            }
+            return json;
+        }
+
+        const alertInfo = rawLog.reduce((acc, log) => {
+            try {
+                // Determine whether the log is empty
+                if (Object.keys(log).length !== 0) {
+                    // Split CEF log
+                    let cef_log = log.split('|');
+                    // Parsing CEF Header
+                    const cef_log_header = cef_log.slice(1, 7);
+                    // Parsing CEF Extends
+                    const cef_log_extends = cefToJson(cef_log[7]);
+
+                    acc.push({
+                        AlertTitle: cef_log_header[4],
+                        // for some like "server error" tickets 
+                        HostName: cef_log_extends.dhost ? cef_log_extends.dhost : cef_log_extends.dvchost,
+                        HostIp: cef_log_extends.dst,
+                        UserName: cef_log_extends.duser,
+                        FileName: cef_log_extends.fname,
+                        FilePath: cef_log_extends.filePath,
+                        Sha256: cef_log_extends.fileHash,
+                        Msg: cef_log_extends.msg,
+                    });
+                }
+                return acc;
+            } catch (error) {
+                console.error(`Error: ${error.message}`);
+            }
+        }, []);
+        return alertInfo;
+    }
 
     function generateDescription() {
         const alertDescriptions = [];
         for (const info of alertInfo) {
-            const { AlertTitle, HostName, HostIp, UserName, CmdLine, Filepath, Sha256 } = info;
-            const desc = `Observed ${AlertTitle}\nHost: ${HostName}  IP: ${HostIp}\nusername: ${UserName}\nCmdline: ${CmdLine}\nFilepath: ${Filepath}\nsha256: ${Sha256}\n\nPlease verify if the activity is legitimate.\n`;
+            const { AlertTitle } = info;
+            var desc = `Observed ${AlertTitle}\n`;
+            Object.entries(info).forEach(([index, value]) => {
+                if (value !== undefined && index != 'AlertTitle' && index != 'CBlink') {
+                    desc += `${index}: ${value}\n`;
+                }
+            });
+            desc += `\nPlease verify if the activity is legitimate.\n`;
             alertDescriptions.push(desc);
         }
         const alertMsg = [...new Set(alertDescriptions)].join('\n');
         alert(alertMsg);
-    };
+    }
+
     function openCB() {
-        let CBURL = "";
+        let CBURL = '';
         for (const info of alertInfo) {
             const { CBlink } = info;
             if (CBlink) {
@@ -585,6 +667,7 @@ function CBAlertHandler() {
     addButton('generateDescription', 'Description', generateDescription);
     addButton('openCB', 'CB', openCB);
 }
+
 
 
 (function () {
@@ -618,7 +701,8 @@ function CBAlertHandler() {
                 'cortex-xdr-json': cortexAlertHandler,
                 'mde-api-json': MDEAlertHandler,
                 'sangfor-ccom-json': HTSCAlertHandler,
-                'CarbonBlack': CBAlertHandler
+                'CarbonBlack': CBAlertHandler,
+                'carbonblack_cef': CBAlertHandler
             };
             const DecoderName = $('#customfield_10807-val').text().trim();
             const handler = handlers[DecoderName];
