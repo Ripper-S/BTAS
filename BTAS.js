@@ -527,6 +527,7 @@ function HTSCAlertHandler() {
 }
 
 function CBAlertHandler() {
+
     console.log('#### Code CBAlertHandler run ####');
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
