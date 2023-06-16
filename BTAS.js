@@ -527,6 +527,7 @@ function HTSCAlertHandler() {
 }
 
 function CBAlertHandler() {
+
     console.log('#### Code CBAlertHandler run ####');
     const { LogSourceDomain, rawLog } = extractLog();
     var alertInfo
