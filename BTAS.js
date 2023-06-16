@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.2.7
+// @version      1.3.1
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen
 // @license      Apache-2.0
@@ -40,24 +40,20 @@ function showFlag(type, title, body, close) {
  */
 function registerSearchMenu() {
     console.log('#### Code registerSearchMenu run ####');
-    var cur_logsourceDomain = $('#customfield_10223-val').text().toString(); //Get current page's Log Source Domain field
-    cur_logsourceDomain = $.trim(cur_logsourceDomain); //trim space
-    cur_logsourceDomain = cur_logsourceDomain.replace(/\n/g, ''); //trim line break
+    const LogSourceDomain = $('#customfield_10223-val').text().trim() || "*";
     const searchEngines = [
         {
             name: 'Jira',
-            url: 'https://caas.pwchk.com/issues/?jql=text%20~%20%22{selectedText}%22%20and%20"Log%20Source%20Domain"%20~%20%27{cur_logsourceDomain}%27%20ORDER%20BY%20created%20DESC',
+            url: 'https://caas.pwchk.com/issues/?jql=text%20~%20%22%s%22%20AND%20' +
+                '%22Log%20Source%20Domain%22%20~%20%22%D%22%20' + 'ORDER%20BY%20created%20DESC'
         },
-        { name: 'VT', url: 'https://www.virustotal.com/gui/search/{selectedText}' },
-        {
-            name: 'AbuseIPDB',
-            url: 'https://www.abuseipdb.com/check/{selectedText}',
-        },
+        { name: 'VT', url: 'https://www.virustotal.com/gui/search/%s' },
+        { name: 'AbuseIPDB', url: 'https://www.abuseipdb.com/check/%s' }
     ];
     searchEngines.forEach(engine => {
         GM_registerMenuCommand(engine.name, () => {
             const selectedText = window.getSelection().toString();
-            const searchURL = engine.url.replace('{selectedText}', selectedText).replace('{cur_logsourceDomain}', cur_logsourceDomain);
+            const searchURL = engine.url.replace('%s', selectedText).replace('%D', LogSourceDomain);
             if (selectedText.length === 0) {
                 showFlag('error', 'No text selected', 'Please select some text and try again', 'auto');
             } else {
@@ -76,13 +72,13 @@ let notifyKey = [...exceptionKey];
 function registerExceptionMenu() {
     console.log('#### Code registerExceptionMenu run ####');
     GM_registerMenuCommand("Add Exception", () => {
-    const selection = window.getSelection().toString().trim();
-    if (!selection) {
-        showFlag('error', 'No Issue Key selected', '', 'auto');
-        return;
-    }
-    exceptionKey.push(selection);
-    localStorage.setItem("exceptionKey", exceptionKey.toString());
+        const selection = window.getSelection().toString().trim();
+        if (!selection) {
+            showFlag('error', 'No Issue Key selected', '', 'auto');
+            return;
+        }
+        exceptionKey.push(selection);
+        localStorage.setItem("exceptionKey", exceptionKey.toString());
         showFlag('success', '', `Added <strong>${selection}</strong> successfully`, 'auto');
     });
 
@@ -107,8 +103,8 @@ function createNotifyControls() {
     function createAudioControl(parentNode) {
         const currentDate = new Date();
         const audioURL = currentDate.getHours() >= 9 && currentDate.getHours() < 21
-        ? 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/12221.wav'
-        : 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/alerts.wav';
+            ? 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/12221.wav'
+            : 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/alerts.wav';
         audioControl.html(`<audio src="${audioURL}" type="audio/mpeg" controls></audio>`);
         parentNode.prepend(audioControl);
     }
@@ -141,7 +137,7 @@ function checkupdate(NotifyControls) {
     if (!table.length) return;
 
     let Tickets = '';
-    table.find('tr').each(function() {
+    table.find('tr').each(function () {
         const summary = $(this).find('.summary p').text().trim();
         const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
         if (!notifyKey.includes(issuekey)) {
@@ -158,7 +154,7 @@ function checkupdate(NotifyControls) {
 
     $('.aui-banner').remove();
     let overdueTickets = '';
-    table.find('tr').each(function() {
+    table.find('tr').each(function () {
         const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
         const datetime = new Date($(this).find('.updated time').attr('datetime'));
         const currentTime = new Date();
@@ -169,7 +165,7 @@ function checkupdate(NotifyControls) {
         }
     });
     if (overdueTickets && promptCheckbox.find('input').prop('checked')) {
-        AJS.banner({body: `ticket: <strong>${overdueTickets}</strong><br>30 minutes have passed since the customer responded, please handle it as soon as possible`});
+        AJS.banner({ body: `ticket: <strong>${overdueTickets}</strong><br>30 minutes have passed since the customer responded, please handle it as soon as possible` });
     }
     // console.info(`#### checkupdate_end: ${notifyKey} ####`);
 }
@@ -186,7 +182,7 @@ function checkKeywords() {
     const strToCheck = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().toLowerCase();
     const matchedKeyword = keywords.find(keyword => strToCheck.includes(keyword.toLowerCase()));
     if (matchedKeyword) {
-        AJS.banner({body: `High Risk Keyword: <strong>${matchedKeyword}</strong><br>Please double-check it, and if it seems suspicious, contact L2 or TL.`});
+        AJS.banner({ body: `High Risk Keyword: <strong>${matchedKeyword}</strong><br>Please double-check it, and if it seems suspicious, contact L2 or TL.` });
     }
 }
 
@@ -206,15 +202,15 @@ function editNotify() {
         'lsh-hk': 'Please escalated according to the Label tags and document.<br>\
         http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
     };
-    const DecoderName = $('#customfield_10223-val').text().trim();
-    const orgNotify = orgNotifydict[DecoderName];
+    const LogSourceDomain = $('#customfield_10223-val').text().trim();
+    const orgNotify = orgNotifydict[LogSourceDomain];
     const Labels = $('.labels-wrap .labels li a span').text();
     const LogSource = $('#customfield_10204-val').text().trim();
     function addEditonClick() {
         // # Add a click event listener to the "Edit" button
-        if (DecoderName.includes('esf') || DecoderName.includes('swireproperties') || DecoderName.includes('lsh-hk')) {
+        if (LogSourceDomain.includes('esf') || LogSourceDomain.includes('swireproperties') || LogSourceDomain.includes('lsh-hk')) {
             $('#edit-issue').on('click', () => {
-                showFlag('warning', `${DecoderName} ticket`, `${orgNotify}`, 'manual');
+                showFlag('warning', `${LogSourceDomain} ticket`, `${orgNotify}`, 'manual');
             });
         }
         // # Add a click event listener to the "Edit" button for LogCollector tickets
@@ -225,7 +221,7 @@ function editNotify() {
             });
         }
         // # Add a click event listener to the "Edit" button for kerrypropshk tickets
-        if (DecoderName.includes('kerrypropshk')) {
+        if (LogSourceDomain.includes('kerrypropshk')) {
             if (Labels === "UnassignedGroup") {
                 $('#edit-issue').on('click', () => {
                     showFlag('warning', 'kerrypropshk UnassignedGroup ticket', 'Please note that if the host starts with cn/sz/bj/sh, Do NOT escalate it on Jira.<br>\
@@ -294,12 +290,12 @@ function cortexAlertHandler() {
         'welab': 'https://welabbank.xdr.sg.paloaltonetworks.com/'
     };
     function extractLog(orgDict) {
-        const DecoderName = $('#customfield_10223-val').text().trim();
-        const orgNavigator = orgDict[DecoderName];
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
+        const orgNavigator = orgDict[LogSourceDomain];
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { DecoderName, orgNavigator, rawLog };
+        return { LogSourceDomain, orgNavigator, rawLog };
     }
-    const { DecoderName, orgNavigator, rawLog} = extractLog(orgDict);
+    const { LogSourceDomain, orgNavigator, rawLog } = extractLog(orgDict);
 
     /**
      * Parse the relevant information from the raw log data
@@ -377,7 +373,7 @@ function cortexAlertHandler() {
                 }
                 window.open(cardURL, '_blank');
             } else {
-                showFlag('error', '', `There is no <strong>${DecoderName}</strong> Navigator on Cortex`, 'auto');
+                showFlag('error', '', `There is no <strong>${LogSourceDomain}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -396,7 +392,7 @@ function cortexAlertHandler() {
                 }
                 timelineURL && window.open(timelineURL, '_blank');
             } else {
-                showFlag('error', '', `There is no <strong>${DecoderName}</strong> Navigator on Cortex`, 'auto');
+                showFlag('error', '', `There is no <strong>${LogSourceDomain}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -408,12 +404,12 @@ function cortexAlertHandler() {
 function MDEAlertHandler() {
     console.log('#### Code MDEAlertHandler run ####');
     function extractLog() {
-        const DecoderName = $('#customfield_10223-val').text().trim();
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { DecoderName, rawLog };
+        return { LogSourceDomain, rawLog };
     }
-    const { DecoderName, rawLog} = extractLog();
-    // console.info(`DecoderName: ${DecoderName}`);
+    const { LogSourceDomain, rawLog } = extractLog();
+    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
     // console.info(`rawLog: ${rawLog}`);
 
     function parseLog(rawLog) {
@@ -425,19 +421,19 @@ function MDEAlertHandler() {
                 const userName = relatedUser ? relatedUser.userName : "N/A";
                 let extrainfo = "";
                 if (evidence) {
-                  const tmp = [];
-                  for (const evidenceItem of evidence) {
-                    if (evidenceItem.entityType === "File") {
-                      const description = `filename:${evidenceItem.fileName}\nfilePath:${evidenceItem.filePath}\nsha1:${evidenceItem.sha1}\n`;
-                      tmp.push(description);
+                    const tmp = [];
+                    for (const evidenceItem of evidence) {
+                        if (evidenceItem.entityType === "File") {
+                            const description = `filename:${evidenceItem.fileName}\nfilePath:${evidenceItem.filePath}\nsha1:${evidenceItem.sha1}\n`;
+                            tmp.push(description);
+                        }
+                        if (evidenceItem.entityType === "Process") {
+                            const description = `cmd:${evidenceItem.processCommandLine}\naccount:${evidenceItem.accountName}\nsha1:${evidenceItem.sha1}\n`;
+                            tmp.push(description);
+                        }
                     }
-                    if (evidenceItem.entityType === "Process") {
-                      const description = `cmd:${evidenceItem.processCommandLine}\naccount:${evidenceItem.accountName}\nsha1:${evidenceItem.sha1}\n`;
-                      tmp.push(description);
-                    }
-                }
-                const uniqueDescriptions = Array.from(new Set(tmp));
-                extrainfo = uniqueDescriptions.join("\n");
+                    const uniqueDescriptions = Array.from(new Set(tmp));
+                    extrainfo = uniqueDescriptions.join("\n");
                 }
                 acc.push({ ...alert, userName, extrainfo });
             } catch (error) {
@@ -483,12 +479,12 @@ function HTSCAlertHandler() {
     }
 
     function extractLog() {
-        const DecoderName = $('#customfield_10223-val').text().trim();
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { DecoderName, rawLog };
+        return { LogSourceDomain, rawLog };
     }
-    const { DecoderName, rawLog} = extractLog();
-    // console.info(`DecoderName: ${DecoderName}`);
+    const { LogSourceDomain, rawLog } = extractLog();
+    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
     // console.info(`rawLog: ${rawLog}`);
 
     const parseLog = (rawLog) => {
@@ -510,7 +506,7 @@ function HTSCAlertHandler() {
             } catch (error) {
                 console.error(`Error: ${error.message}`);
             }
-          return acc;
+            return acc;
         }, []);
         return alertInfo;
     };
@@ -533,12 +529,12 @@ function HTSCAlertHandler() {
 function CBAlertHandler() {
     console.log('#### Code CBAlertHandler run ####');
     function extractLog() {
-        const DecoderName = $('#customfield_10223-val').text().trim();
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { DecoderName, rawLog };
+        return { LogSourceDomain, rawLog };
     }
-    const { DecoderName, rawLog} = extractLog();
-    // console.info(`DecoderName: ${DecoderName}`);
+    const { LogSourceDomain, rawLog } = extractLog();
+    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
     // console.info(`rawLog: ${rawLog}`);
 
     function parseLog(rawLog) {
@@ -590,7 +586,7 @@ function CBAlertHandler() {
 }
 
 
-(function() {
+(function () {
     'use strict';
 
     registerSearchMenu();
@@ -623,8 +619,8 @@ function CBAlertHandler() {
                 'sangfor-ccom-json': HTSCAlertHandler,
                 'CarbonBlack': CBAlertHandler
             };
-            const decoderName = $('#customfield_10807-val').text().trim();
-            const handler = handlers[decoderName];
+            const DecoderName = $('#customfield_10807-val').text().trim();
+            const handler = handlers[DecoderName];
             if (handler) {
                 handler();
             }
