@@ -203,10 +203,10 @@ function editNotify() {
         https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping',
         'swireproperties':
             'Please escalated according to the group, hostname value.<br>\
-            Check if additional Participants need to be added through HK_MSS_SOP.doc',
+        Check if additional Participants need to be added through HK_MSS_SOP.doc',
         'lsh-hk':
             'Please escalated according to the Label tags and document.<br>\
-            http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
+        http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
     };
     const LogSourceDomain = $('#customfield_10223-val').text().trim();
     const orgNotify = orgNotifydict[LogSourceDomain];
@@ -230,7 +230,7 @@ function editNotify() {
                     'warning',
                     'LogCollector ticket',
                     'When processing a ticket containing "LogCollector" in the Log Source<br>\
-Please do NOT escalate to the customer and contact Jones/Franky first to confirm if it is due to other reasons',
+                Please do NOT escalate to the customer and contact Jones/Franky first to confirm if it is due to other reasons',
                     'manual'
                 );
             });
@@ -243,9 +243,9 @@ Please do NOT escalate to the customer and contact Jones/Franky first to confirm
                         'warning',
                         'kerrypropshk UnassignedGroup ticket',
                         'Please note that if the host starts with cn/sz/bj/sh, Do NOT escalate it on Jira.<br>\
-Instead, share the issue key and MDE link with Desen and Barry.<br>\
-Then, choose "Won\'t Do" as the Resolution and Resolve this issue.<br>\
-In the Comments, mention that the host belongs to PRC and has been handed over to the SH team for handling.',
+                    Instead, share the issue key and MDE link with Desen and Barry.<br>\
+                    Then, choose "Won\'t Do" as the Resolution and Resolve this issue.<br>\
+                    In the Comments, mention that the host belongs to PRC and has been handed over to the SH team for handling.',
                         'manual'
                     );
                 });
@@ -726,7 +726,6 @@ function CBAlertHandler() {
         const alertMsg = [...new Set(alertDescriptions)].join('\n');
         alert(alertMsg);
     }
-
     function openCB() {
         let CBURL = '';
         for (const info of alertInfo) {
@@ -748,10 +747,7 @@ function CBAlertHandler() {
     registerExceptionMenu();
 
     // Filter page: audio control registration and regular issues table update
-    if (
-        (window.location.href.includes('filter=15200') || window.location.href.includes('filter=20404')) &&
-        !window.location.href.includes('MSS')
-    ) {
+    if (window.location.href.includes('filter=15200') && !window.location.href.includes('MSS')) {
         console.log('#### Code includes filter run ####');
         const NotifyControls = createNotifyControls();
 
