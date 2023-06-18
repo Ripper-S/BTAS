@@ -28,7 +28,7 @@ function showFlag(type, title, body, close) {
         type: type,
         title: title,
         body: body,
-        close: close,
+        close: close
     });
 }
 
@@ -45,24 +45,17 @@ function registerSearchMenu() {
             url:
                 'https://caas.pwchk.com/issues/?jql=text%20~%20%22%s%22%20AND%20' +
                 '%22Log%20Source%20Domain%22%20~%20%22%D%22%20' +
-                'ORDER%20BY%20created%20DESC',
+                'ORDER%20BY%20created%20DESC'
         },
         { name: 'VT', url: 'https://www.virustotal.com/gui/search/%s' },
-        { name: 'AbuseIPDB', url: 'https://www.abuseipdb.com/check/%s' },
+        { name: 'AbuseIPDB', url: 'https://www.abuseipdb.com/check/%s' }
     ];
     searchEngines.forEach(engine => {
         GM_registerMenuCommand(engine.name, () => {
             const selectedText = window.getSelection().toString();
-            const searchURL = engine.url
-                .replace('%s', selectedText)
-                .replace('%D', LogSourceDomain);
+            const searchURL = engine.url.replace('%s', selectedText).replace('%D', LogSourceDomain);
             if (selectedText.length === 0) {
-                showFlag(
-                    'error',
-                    'No text selected',
-                    'Please select some text and try again',
-                    'auto'
-                );
+                showFlag('error', 'No text selected', 'Please select some text and try again', 'auto');
             } else {
                 window.open(searchURL, '_blank');
             }
@@ -86,12 +79,7 @@ function registerExceptionMenu() {
         }
         exceptionKey.push(selection);
         localStorage.setItem('exceptionKey', exceptionKey.toString());
-        showFlag(
-            'success',
-            '',
-            `Added <strong>${selection}</strong> successfully`,
-            'auto'
-        );
+        showFlag('success', '', `Added <strong>${selection}</strong> successfully`, 'auto');
     });
 
     GM_registerMenuCommand('Clear Exception', () => {
@@ -117,9 +105,7 @@ function createNotifyControls() {
             currentDate.getHours() >= 9 && currentDate.getHours() < 21
                 ? 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/12221.wav'
                 : 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/alerts.wav';
-        audioControl.html(
-            `<audio src="${audioURL}" type="audio/mpeg" controls></audio>`
-        );
+        audioControl.html(`<audio src="${audioURL}" type="audio/mpeg" controls></audio>`);
         parentNode.prepend(audioControl);
     }
 
@@ -127,14 +113,10 @@ function createNotifyControls() {
         const checkbox = $('<span></span>');
         const value = localStorage.getItem(localStorageKey);
         checkbox.html(
-            `<input type="checkbox" name="${localStorageKey}" ${value == 'true' ? 'checked' : ''
-            }>${localStorageKey}`
+            `<input type="checkbox" name="${localStorageKey}" ${value == 'true' ? 'checked' : ''}>${localStorageKey}`
         );
         checkbox.find('input').on('click', () => {
-            localStorage.setItem(
-                localStorageKey,
-                checkbox.find('input').prop('checked')
-            );
+            localStorage.setItem(localStorageKey, checkbox.find('input').prop('checked'));
         });
         parentNode.prepend(checkbox);
         return checkbox;
@@ -152,17 +134,14 @@ function createNotifyControls() {
  */
 function checkupdate(NotifyControls) {
     console.log('#### Code checkupdate run ####');
-    const { audioControl, audioCheckbox, keepCheckbox, promptCheckbox } =
-        NotifyControls;
+    const { audioControl, audioCheckbox, keepCheckbox, promptCheckbox } = NotifyControls;
     const table = $('tbody');
     if (!table.length) return;
 
     let Tickets = '';
     table.find('tr').each(function () {
         const summary = $(this).find('.summary p').text().trim();
-        const issuekey = $(this)
-            .find('.issuekey a.issue-link')
-            .attr('data-issue-key');
+        const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
         if (!notifyKey.includes(issuekey)) {
             notifyKey.push(issuekey);
             Tickets += `${summary}==${issuekey}\n`;
@@ -178,9 +157,7 @@ function checkupdate(NotifyControls) {
     $('.aui-banner').remove();
     let overdueTickets = '';
     table.find('tr').each(function () {
-        const issuekey = $(this)
-            .find('.issuekey a.issue-link')
-            .attr('data-issue-key');
+        const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
         const datetime = new Date($(this).find('.updated time').attr('datetime'));
         const currentTime = new Date();
         const diffMs = currentTime - datetime;
@@ -191,7 +168,7 @@ function checkupdate(NotifyControls) {
     });
     if (overdueTickets && promptCheckbox.find('input').prop('checked')) {
         AJS.banner({
-            body: `ticket: <strong>${overdueTickets}</strong><br>30 minutes have passed since the customer responded, please handle it as soon as possible`,
+            body: `ticket: <strong>${overdueTickets}</strong><br>30 minutes have passed since the customer responded, please handle it as soon as possible`
         });
     }
     // console.info(`#### checkupdate_end: ${notifyKey} ####`);
@@ -205,18 +182,11 @@ function checkupdate(NotifyControls) {
 function checkKeywords() {
     console.log('#### Code checkKeywords run ####');
     const keywords = ['keyword1', 'mimikatz', 'keyword3'];
-    const strToCheck = $(
-        '#field-customfield_10219 > div:first-child > div:nth-child(2)'
-    )
-        .text()
-        .trim()
-        .toLowerCase();
-    const matchedKeyword = keywords.find(keyword =>
-        strToCheck.includes(keyword.toLowerCase())
-    );
+    const strToCheck = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().toLowerCase();
+    const matchedKeyword = keywords.find(keyword => strToCheck.includes(keyword.toLowerCase()));
     if (matchedKeyword) {
         AJS.banner({
-            body: `High Risk Keyword: <strong>${matchedKeyword}</strong><br>Please double-check it, and if it seems suspicious, contact L2 or TL.`,
+            body: `High Risk Keyword: <strong>${matchedKeyword}</strong><br>Please double-check it, and if it seems suspicious, contact L2 or TL.`
         });
     }
 }
@@ -229,14 +199,14 @@ function checkKeywords() {
 function editNotify() {
     console.log('#### Code editNotify run ####');
     const orgNotifydict = {
-        esf: 'Please escalated according to the Label tags and document.<br>\
-https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping',
-        swireproperties:
+        'esf': 'Please escalated according to the Label tags and document.<br>\
+        https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping',
+        'swireproperties':
             'Please escalated according to the group, hostname value.<br>\
-Check if additional Participants need to be added through HK_MSS_SOP.doc',
+            Check if additional Participants need to be added through HK_MSS_SOP.doc',
         'lsh-hk':
             'Please escalated according to the Label tags and document.<br>\
-http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
+            http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
     };
     const LogSourceDomain = $('#customfield_10223-val').text().trim();
     const orgNotify = orgNotifydict[LogSourceDomain];
@@ -250,12 +220,7 @@ http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
             LogSourceDomain.includes('lsh-hk')
         ) {
             $('#edit-issue').on('click', () => {
-                showFlag(
-                    'warning',
-                    `${LogSourceDomain} ticket`,
-                    `${orgNotify}`,
-                    'manual'
-                );
+                showFlag('warning', `${LogSourceDomain} ticket`, `${orgNotify}`, 'manual');
             });
         }
         // # Add a click event listener to the "Edit" button for LogCollector tickets
@@ -336,27 +301,22 @@ function cortexAlertHandler() {
      * @returns {Object} An object that contains the organization's name, organization's navigator URL, raw log information
      */
     const orgDict = {
-        bossini: 'https://bossini.xdr.sg.paloaltonetworks.com/',
-        hkuniversity: 'https://cpos.xdr.sg.paloaltonetworks.com/',
-        citysuper: 'https://citysuper.xdr.sg.paloaltonetworks.com/',
+        'bossini': 'https://bossini.xdr.sg.paloaltonetworks.com/',
+        'hkuniversity': 'https://cpos.xdr.sg.paloaltonetworks.com/',
+        'citysuper': 'https://citysuper.xdr.sg.paloaltonetworks.com/',
         'esf-dc': 'https://esf.xdr.us.paloaltonetworks.com/',
-        glshk: 'https://glshk.xdr.us.paloaltonetworks.com/',
-        kerrylogistics: 'https://kerrylogistics.xdr.us.paloaltonetworks.com/',
+        'glshk': 'https://glshk.xdr.us.paloaltonetworks.com/',
+        'kerrylogistics': 'https://kerrylogistics.xdr.us.paloaltonetworks.com/',
         'k11-hk': 'https://k11.xdr.sg.paloaltonetworks.com/',
-        newworld: 'https://nwcs.xdr.sg.paloaltonetworks.com/',
-        nws: 'https://nws.xdr.sg.paloaltonetworks.com/',
-        toppanmerrill: 'https://tpm-apac.xdr.us.paloaltonetworks.com/',
-        welab: 'https://welabbank.xdr.sg.paloaltonetworks.com/',
+        'newworld': 'https://nwcs.xdr.sg.paloaltonetworks.com/',
+        'nws': 'https://nws.xdr.sg.paloaltonetworks.com/',
+        'toppanmerrill': 'https://tpm-apac.xdr.us.paloaltonetworks.com/',
+        'welab': 'https://welabbank.xdr.sg.paloaltonetworks.com/'
     };
     function extractLog(orgDict) {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
         const orgNavigator = orgDict[LogSourceDomain];
-        let rawLog = $(
-            '#field-customfield_10219 > div:first-child > div:nth-child(2)'
-        )
-            .text()
-            .trim()
-            .split('\n');
+        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, orgNavigator, rawLog };
     }
     const { LogSourceDomain, orgNavigator, rawLog } = extractLog(orgDict);
@@ -374,20 +334,15 @@ function cortexAlertHandler() {
                 const isPANNGFW = source === 'PAN NGFW';
                 const alert = { source, alert_id, name, description };
                 if (isPANNGFW) {
-                    const {
-                        action_local_ip,
-                        action_local_port,
-                        action_remote_ip,
-                        action_remote_port,
-                        action_pretty,
-                    } = cortex_xdr;
+                    const { action_local_ip, action_local_port, action_remote_ip, action_remote_port, action_pretty } =
+                        cortex_xdr;
                     acc.push({
                         ...alert,
                         action_local_ip,
                         action_local_port,
                         action_remote_ip,
                         action_remote_port,
-                        action_pretty,
+                        action_pretty
                     });
                 } else {
                     const {
@@ -400,7 +355,7 @@ function cortexAlertHandler() {
                         host_name,
                         host_ip,
                         user_name,
-                        actor_process_command_line,
+                        actor_process_command_line
                     } = cortex_xdr;
                     const filename = action_file_name || actor_process_image_name;
                     const filepath = action_file_path || actor_process_image_path;
@@ -413,7 +368,7 @@ function cortexAlertHandler() {
                         actor_process_command_line,
                         filename,
                         filepath,
-                        sha256,
+                        sha256
                     });
                 }
             } catch (error) {
@@ -449,30 +404,21 @@ function cortexAlertHandler() {
                 filename,
                 filepath,
                 sha256,
-                description,
+                description
             } = info;
             if (source === 'PAN NGFW') {
                 const desc = `Observed ${name}\nSrcip: ${action_local_ip}   Srcport: ${action_local_port}\nDstip: ${action_remote_ip}   Dstport: ${action_remote_port}\nAction: ${action_pretty}\n\nPlease help to verify if this activity is legitimate.\n`;
                 alertDescriptions.push(desc);
             } else {
-                const desc = `Observed ${description || name
-                    }\nHost: ${host_name}   IP: ${host_ip}\nusername: ${user_name}\ncmd: ${actor_process_command_line}\nfilename: ${filename}\nfilepath:\n${filepath}\nhttps://www.virustotal.com/gui/file/${sha256}\n\nPlease help to verify if it is legitimate, if not please remove it and perform a full scan.\n`;
+                const desc = `Observed ${
+                    description || name
+                }\nHost: ${host_name}   IP: ${host_ip}\nusername: ${user_name}\ncmd: ${actor_process_command_line}\nfilename: ${filename}\nfilepath:\n${filepath}\nhttps://www.virustotal.com/gui/file/${sha256}\n\nPlease help to verify if it is legitimate, if not please remove it and perform a full scan.\n`;
                 alertDescriptions.push(desc);
             }
             const toolbarSha256 = $('.aui-toolbar2-inner');
             // console.info(`toolbar_sha256: ${toolbarSha256.clone().children().remove().end().text().trim()}`);
             // console.info(`sha256: ${sha256}`);
-            if (
-                sha256 &&
-                !toolbarSha256
-                    .clone()
-                    .children()
-                    .remove()
-                    .end()
-                    .text()
-                    .trim()
-                    .includes(sha256)
-            ) {
+            if (sha256 && !toolbarSha256.clone().children().remove().end().text().trim().includes(sha256)) {
                 toolbarSha256.append(`${sha256} `);
             }
         }
@@ -497,12 +443,7 @@ function cortexAlertHandler() {
                 }
                 window.open(cardURL, '_blank');
             } else {
-                showFlag(
-                    'error',
-                    '',
-                    `There is no <strong>${LogSourceDomain}</strong> Navigator on Cortex`,
-                    'auto'
-                );
+                showFlag('error', '', `There is no <strong>${LogSourceDomain}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -526,12 +467,7 @@ function cortexAlertHandler() {
                 }
                 timelineURL && window.open(timelineURL, '_blank');
             } else {
-                showFlag(
-                    'error',
-                    '',
-                    `There is no <strong>${LogSourceDomain}</strong> Navigator on Cortex`,
-                    'auto'
-                );
+                showFlag('error', '', `There is no <strong>${LogSourceDomain}</strong> Navigator on Cortex`, 'auto');
             }
         }
     }
@@ -544,12 +480,7 @@ function MDEAlertHandler() {
     console.log('#### Code MDEAlertHandler run ####');
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
-        let rawLog = $(
-            '#field-customfield_10219 > div:first-child > div:nth-child(2)'
-        )
-            .text()
-            .trim()
-            .split('\n');
+        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, rawLog };
     }
     const { LogSourceDomain, rawLog } = extractLog();
@@ -624,12 +555,7 @@ function HTSCAlertHandler() {
 
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
-        let rawLog = $(
-            '#field-customfield_10219 > div:first-child > div:nth-child(2)'
-        )
-            .text()
-            .trim()
-            .split('\n');
+        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, rawLog };
     }
     const { LogSourceDomain, rawLog } = extractLog();
@@ -649,7 +575,7 @@ function HTSCAlertHandler() {
                     srcIP: logObj.src_ip,
                     eventEvidence,
                     hostName: logObj.hostName,
-                    dstIP: logObj.dst_ip,
+                    dstIP: logObj.dst_ip
                 };
                 acc.push(alert);
             } catch (error) {
@@ -665,8 +591,7 @@ function HTSCAlertHandler() {
     function generateDescription() {
         const alertDescriptions = [];
         for (const info of alertInfo) {
-            const { attackType, hostRisk, srcIP, hostName, dstIP, eventEvidence } =
-                info;
+            const { attackType, hostRisk, srcIP, hostName, dstIP, eventEvidence } = info;
             const desc = `Observed ${attackType} Attack\nhostRisk: ${hostRisk}\nSrc_IP: ${srcIP}\nhostname: ${hostName}\nDst_IP: ${dstIP}\nevent_evidence: ${eventEvidence}\n\nPlease help to verify if this activity is legitimate.\n`;
             alertDescriptions.push(desc);
         }
@@ -689,12 +614,7 @@ function CBAlertHandler() {
 
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
-        let rawLog = $(
-            '#field-customfield_10219 > div:first-child > div:nth-child(2)'
-        )
-            .text()
-            .trim()
-            .split('\n');
+        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, rawLog };
     }
 
@@ -721,7 +641,7 @@ function CBAlertHandler() {
                         CmdLine: cb_log.cmdline,
                         CBlink: cb_log.link_process,
                         Filepath: cb_log.path,
-                        Sha256: cb_log.process_sha256,
+                        Sha256: cb_log.process_sha256
                     });
                 }
             } catch (error) {
@@ -746,17 +666,9 @@ function CBAlertHandler() {
                 if (value) {
                     value = value.replace(/\\\\=/g, '=').replace(/\\\\s/g, ' ');
 
-                    if (
-                        key === 'filePath' ||
-                        key === 'msg' ||
-                        key === 'start' ||
-                        key === 'rt'
-                    ) {
+                    if (key === 'filePath' || key === 'msg' || key === 'start' || key === 'rt') {
                         var nextFieldIndex = i + 1;
-                        while (
-                            nextFieldIndex < fields.length &&
-                            !fields[nextFieldIndex].includes('=')
-                        ) {
+                        while (nextFieldIndex < fields.length && !fields[nextFieldIndex].includes('=')) {
                             value += ' ' + fields[nextFieldIndex];
                             nextFieldIndex++;
                         }
@@ -781,15 +693,13 @@ function CBAlertHandler() {
                     acc.push({
                         AlertTitle: cef_log_header[4],
                         // for some like "server error" tickets
-                        HostName: cef_log_extends.dhost
-                            ? cef_log_extends.dhost
-                            : cef_log_extends.dvchost,
+                        HostName: cef_log_extends.dhost ? cef_log_extends.dhost : cef_log_extends.dvchost,
                         HostIp: cef_log_extends.dst,
                         UserName: cef_log_extends.duser,
                         FileName: cef_log_extends.fname,
                         FilePath: cef_log_extends.filePath,
                         Sha256: cef_log_extends.fileHash,
-                        Msg: cef_log_extends.msg,
+                        Msg: cef_log_extends.msg
                     });
                 }
                 return acc;
@@ -839,8 +749,7 @@ function CBAlertHandler() {
 
     // Filter page: audio control registration and regular issues table update
     if (
-        (window.location.href.includes('filter=15200') ||
-            window.location.href.includes('filter=20404')) &&
+        (window.location.href.includes('filter=15200') || window.location.href.includes('filter=20404')) &&
         !window.location.href.includes('MSS')
     ) {
         console.log('#### Code includes filter run ####');
@@ -858,11 +767,7 @@ function CBAlertHandler() {
 
     // Issue page: Alert Handler
     setInterval(() => {
-        if (
-            $('#issue-content').length &&
-            !$('#generateDescription').length &&
-            !$('.aui-banner-error').length
-        ) {
+        if ($('#issue-content').length && !$('#generateDescription').length && !$('.aui-banner-error').length) {
             console.log('#### Code Issue page: Alert Handler ####');
             checkKeywords();
 
@@ -870,8 +775,8 @@ function CBAlertHandler() {
                 'cortex-xdr-json': cortexAlertHandler,
                 'mde-api-json': MDEAlertHandler,
                 'sangfor-ccom-json': HTSCAlertHandler,
-                CarbonBlack: CBAlertHandler,
-                carbonblack_cef: CBAlertHandler,
+                'CarbonBlack': CBAlertHandler,
+                'carbonblack_cef': CBAlertHandler
             };
             const DecoderName = $('#customfield_10807-val').text().trim();
             const handler = handlers[DecoderName];
