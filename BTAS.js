@@ -16,14 +16,13 @@
 // ==/UserScript==
 var $ = window.jQuery;
 
-
 /**
  * This function creates and displays a flag using AJS.flag function
  * @param {string} type - The type of flag, can be one of the following: "success", "info", "warning", "error"
  * @param {string} title - The title of the flag
  * @param {string} body - The body of the flag
  * @param {string} close - The close of flag, can be one of the following: "auto", "manual", "never"
-*/
+ */
 function showFlag(type, title, body, close) {
     AJS.flag({
         type: type,
@@ -33,19 +32,20 @@ function showFlag(type, title, body, close) {
     });
 }
 
-
 /**
  * This function registers a Tampermonkey search menu command
  * @param {Array} searchEngines - Search engines array containing the Jira, VT, AbuseIPDB
  */
 function registerSearchMenu() {
     console.log('#### Code registerSearchMenu run ####');
-    const LogSourceDomain = $('#customfield_10223-val').text().trim() || "*";
+    const LogSourceDomain = $('#customfield_10223-val').text().trim() || '*';
     const searchEngines = [
         {
             name: 'Jira',
-            url: 'https://caas.pwchk.com/issues/?jql=text%20~%20%22%s%22%20AND%20' +
-            '%22Log%20Source%20Domain%22%20~%20%22%D%22%20' + 'ORDER%20BY%20created%20DESC'
+            url:
+                'https://caas.pwchk.com/issues/?jql=text%20~%20%22%s%22%20AND%20' +
+                '%22Log%20Source%20Domain%22%20~%20%22%D%22%20' +
+                'ORDER%20BY%20created%20DESC'
         },
         { name: 'VT', url: 'https://www.virustotal.com/gui/search/%s' },
         { name: 'AbuseIPDB', url: 'https://www.abuseipdb.com/check/%s' }
@@ -71,24 +71,23 @@ let exceptionKey = localStorage.getItem('exceptionKey')?.split(',') || [];
 let notifyKey = [...exceptionKey];
 function registerExceptionMenu() {
     console.log('#### Code registerExceptionMenu run ####');
-    GM_registerMenuCommand("Add Exception", () => {
-    const selection = window.getSelection().toString().trim();
-    if (!selection) {
-        showFlag('error', 'No Issue Key selected', '', 'auto');
-        return;
-    }
-    exceptionKey.push(selection);
-    localStorage.setItem("exceptionKey", exceptionKey.toString());
+    GM_registerMenuCommand('Add Exception', () => {
+        const selection = window.getSelection().toString().trim();
+        if (!selection) {
+            showFlag('error', 'No Issue Key selected', '', 'auto');
+            return;
+        }
+        exceptionKey.push(selection);
+        localStorage.setItem('exceptionKey', exceptionKey.toString());
         showFlag('success', '', `Added <strong>${selection}</strong> successfully`, 'auto');
     });
 
-    GM_registerMenuCommand("Clear Exception", () => {
-        localStorage.setItem("exceptionKey", "");
+    GM_registerMenuCommand('Clear Exception', () => {
+        localStorage.setItem('exceptionKey', '');
         exceptionKey = notifyKey = [];
         showFlag('success', 'Cleared All Issue Key', '', 'auto');
     });
 }
-
 
 /**
  * This function creates audio and checkbox controls and adds them to the Jira share button's parent node
@@ -102,9 +101,10 @@ function createNotifyControls() {
 
     function createAudioControl(parentNode) {
         const currentDate = new Date();
-        const audioURL = currentDate.getHours() >= 9 && currentDate.getHours() < 21
-        ? 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/12221.wav'
-        : 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/alerts.wav';
+        const audioURL =
+            currentDate.getHours() >= 9 && currentDate.getHours() < 21
+                ? 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/12221.wav'
+                : 'https://aspirepig-1251964320.cos.ap-shanghai.myqcloud.com/alerts.wav';
         audioControl.html(`<audio src="${audioURL}" type="audio/mpeg" controls></audio>`);
         parentNode.prepend(audioControl);
     }
@@ -112,7 +112,9 @@ function createNotifyControls() {
     function createCheckbox(parentNode, localStorageKey) {
         const checkbox = $('<span></span>');
         const value = localStorage.getItem(localStorageKey);
-        checkbox.html(`<input type="checkbox" name="${localStorageKey}" ${value == 'true' ? 'checked' : ''}>${localStorageKey}`);
+        checkbox.html(
+            `<input type="checkbox" name="${localStorageKey}" ${value == 'true' ? 'checked' : ''}>${localStorageKey}`
+        );
         checkbox.find('input').on('click', () => {
             localStorage.setItem(localStorageKey, checkbox.find('input').prop('checked'));
         });
@@ -137,7 +139,7 @@ function checkupdate(NotifyControls) {
     if (!table.length) return;
 
     let Tickets = '';
-    table.find('tr').each(function() {
+    table.find('tr').each(function () {
         const summary = $(this).find('.summary p').text().trim();
         const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
         if (!notifyKey.includes(issuekey)) {
@@ -154,22 +156,23 @@ function checkupdate(NotifyControls) {
 
     $('.aui-banner').remove();
     let overdueTickets = '';
-    table.find('tr').each(function() {
+    table.find('tr').each(function () {
         const issuekey = $(this).find('.issuekey a.issue-link').attr('data-issue-key');
         const datetime = new Date($(this).find('.updated time').attr('datetime'));
         const currentTime = new Date();
         const diffMs = currentTime - datetime;
         const diffMinutes = Math.floor(diffMs / 60000);
         if (diffMinutes > 30) {
-            overdueTickets += `${issuekey}, `
+            overdueTickets += `${issuekey}, `;
         }
     });
     if (overdueTickets && promptCheckbox.find('input').prop('checked')) {
-        AJS.banner({body: `ticket: <strong>${overdueTickets}</strong><br>30 minutes have passed since the customer responded, please handle it as soon as possible`});
+        AJS.banner({
+            body: `ticket: <strong>${overdueTickets}</strong><br>30 minutes have passed since the customer responded, please handle it as soon as possible`
+        });
     }
     // console.info(`#### checkupdate_end: ${notifyKey} ####`);
 }
-
 
 /**
  * This function checks for specific keywords within a string
@@ -182,10 +185,11 @@ function checkKeywords() {
     const strToCheck = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().toLowerCase();
     const matchedKeyword = keywords.find(keyword => strToCheck.includes(keyword.toLowerCase()));
     if (matchedKeyword) {
-        AJS.banner({body: `High Risk Keyword: <strong>${matchedKeyword}</strong><br>Please double-check it, and if it seems suspicious, contact L2 or TL.`});
+        AJS.banner({
+            body: `High Risk Keyword: <strong>${matchedKeyword}</strong><br>Please double-check it, and if it seems suspicious, contact L2 or TL.`
+        });
     }
 }
-
 
 /**
  * This function initializes the edit notification functionality.
@@ -197,9 +201,11 @@ function editNotify() {
     const orgNotifydict = {
         'esf': 'Please escalated according to the Label tags and document.<br>\
         https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping',
-        'swireproperties': 'Please escalated according to the group, hostname value.<br>\
+        'swireproperties':
+            'Please escalated according to the group, hostname value.<br>\
         Check if additional Participants need to be added through HK_MSS_SOP.doc',
-        'lsh-hk': 'Please escalated according to the Label tags and document.<br>\
+        'lsh-hk':
+            'Please escalated according to the Label tags and document.<br>\
         http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
     };
     const LogSourceDomain = $('#customfield_10223-val').text().trim();
@@ -208,7 +214,11 @@ function editNotify() {
     const LogSource = $('#customfield_10204-val').text().trim();
     function addEditonClick() {
         // # Add a click event listener to the "Edit" button
-        if (LogSourceDomain.includes('esf') || LogSourceDomain.includes('swireproperties') || LogSourceDomain.includes('lsh-hk')) {
+        if (
+            LogSourceDomain.includes('esf') ||
+            LogSourceDomain.includes('swireproperties') ||
+            LogSourceDomain.includes('lsh-hk')
+        ) {
             $('#edit-issue').on('click', () => {
                 showFlag('warning', `${LogSourceDomain} ticket`, `${orgNotify}`, 'manual');
             });
@@ -216,22 +226,37 @@ function editNotify() {
         // # Add a click event listener to the "Edit" button for LogCollector tickets
         if (LogSource.includes('LogCollector')) {
             $('#edit-issue').on('click', () => {
-                showFlag('warning', 'LogCollector ticket', 'When processing a ticket containing "LogCollector" in the Log Source<br>\
-                Please do NOT escalate to the customer and contact Jones/Franky first to confirm if it is due to other reasons', 'manual');
+                showFlag(
+                    'warning',
+                    'LogCollector ticket',
+                    'When processing a ticket containing "LogCollector" in the Log Source<br>\
+                Please do NOT escalate to the customer and contact Jones/Franky first to confirm if it is due to other reasons',
+                    'manual'
+                );
             });
         }
         // # Add a click event listener to the "Edit" button for kerrypropshk tickets
         if (LogSourceDomain.includes('kerrypropshk')) {
-            if (Labels === "UnassignedGroup") {
+            if (Labels === 'UnassignedGroup') {
                 $('#edit-issue').on('click', () => {
-                    showFlag('warning', 'kerrypropshk UnassignedGroup ticket', 'Please note that if the host starts with cn/sz/bj/sh, Do NOT escalate it on Jira.<br>\
+                    showFlag(
+                        'warning',
+                        'kerrypropshk UnassignedGroup ticket',
+                        'Please note that if the host starts with cn/sz/bj/sh, Do NOT escalate it on Jira.<br>\
                     Instead, share the issue key and MDE link with Desen and Barry.<br>\
                     Then, choose "Won\'t Do" as the Resolution and Resolve this issue.<br>\
-                    In the Comments, mention that the host belongs to PRC and has been handed over to the SH team for handling.', 'manual');
+                    In the Comments, mention that the host belongs to PRC and has been handed over to the SH team for handling.',
+                        'manual'
+                    );
                 });
             } else {
                 $('#edit-issue').on('click', () => {
-                    showFlag('warning', 'kerrypropshk ticket', 'Please copy the description to the comments for the customer', 'manual');
+                    showFlag(
+                        'warning',
+                        'kerrypropshk ticket',
+                        'Please copy the description to the comments for the customer',
+                        'manual'
+                    );
                 });
             }
         }
@@ -240,12 +265,11 @@ function editNotify() {
 
     function generateEditnotify() {
         const toolbar = $('.aui-toolbar2-primary');
-        const element = $('<div id="generateEditnotify"></div>')
+        const element = $('<div id="generateEditnotify"></div>');
         toolbar.append(element);
-    };
+    }
     generateEditnotify();
 }
-
 
 /**
  * Creates a new button and adds it to the DOM.
@@ -295,7 +319,7 @@ function cortexAlertHandler() {
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, orgNavigator, rawLog };
     }
-    const { LogSourceDomain, orgNavigator, rawLog} = extractLog(orgDict);
+    const { LogSourceDomain, orgNavigator, rawLog } = extractLog(orgDict);
 
     /**
      * Parse the relevant information from the raw log data
@@ -310,14 +334,42 @@ function cortexAlertHandler() {
                 const isPANNGFW = source === 'PAN NGFW';
                 const alert = { source, alert_id, name, description };
                 if (isPANNGFW) {
-                    const { action_local_ip, action_local_port, action_remote_ip, action_remote_port, action_pretty } = cortex_xdr;
-                    acc.push({ ...alert, action_local_ip, action_local_port, action_remote_ip, action_remote_port, action_pretty });
+                    const { action_local_ip, action_local_port, action_remote_ip, action_remote_port, action_pretty } =
+                        cortex_xdr;
+                    acc.push({
+                        ...alert,
+                        action_local_ip,
+                        action_local_port,
+                        action_remote_ip,
+                        action_remote_port,
+                        action_pretty
+                    });
                 } else {
-                    const { action_file_name, action_file_path, action_file_sha256, actor_process_image_name, actor_process_image_path, actor_process_image_sha256, host_name, host_ip, user_name, actor_process_command_line } = cortex_xdr;
+                    const {
+                        action_file_name,
+                        action_file_path,
+                        action_file_sha256,
+                        actor_process_image_name,
+                        actor_process_image_path,
+                        actor_process_image_sha256,
+                        host_name,
+                        host_ip,
+                        user_name,
+                        actor_process_command_line
+                    } = cortex_xdr;
                     const filename = action_file_name || actor_process_image_name;
                     const filepath = action_file_path || actor_process_image_path;
                     const sha256 = action_file_sha256 || actor_process_image_sha256;
-                    acc.push({ ...alert, host_name, host_ip, user_name, actor_process_command_line, filename, filepath, sha256 });
+                    acc.push({
+                        ...alert,
+                        host_name,
+                        host_ip,
+                        user_name,
+                        actor_process_command_line,
+                        filename,
+                        filepath,
+                        sha256
+                    });
                 }
             } catch (error) {
                 console.error(`Error: ${error.message}`);
@@ -337,12 +389,30 @@ function cortexAlertHandler() {
     function generateDescription() {
         const alertDescriptions = [];
         for (const info of alertInfo) {
-            const { source, name, action_local_ip, action_local_port, action_remote_ip, action_remote_port, action_pretty, host_name, host_ip, user_name, actor_process_command_line, filename, filepath, sha256, description } = info;
+            const {
+                source,
+                name,
+                action_local_ip,
+                action_local_port,
+                action_remote_ip,
+                action_remote_port,
+                action_pretty,
+                host_name,
+                host_ip,
+                user_name,
+                actor_process_command_line,
+                filename,
+                filepath,
+                sha256,
+                description
+            } = info;
             if (source === 'PAN NGFW') {
                 const desc = `Observed ${name}\nSrcip: ${action_local_ip}   Srcport: ${action_local_port}\nDstip: ${action_remote_ip}   Dstport: ${action_remote_port}\nAction: ${action_pretty}\n\nPlease help to verify if this activity is legitimate.\n`;
                 alertDescriptions.push(desc);
             } else {
-                const desc = `Observed ${description || name}\nHost: ${host_name}   IP: ${host_ip}\nusername: ${user_name}\ncmd: ${actor_process_command_line}\nfilename: ${filename}\nfilepath:\n${filepath}\nhttps://www.virustotal.com/gui/file/${sha256}\n\nPlease help to verify if it is legitimate, if not please remove it and perform a full scan.\n`;
+                const desc = `Observed ${
+                    description || name
+                }\nHost: ${host_name}   IP: ${host_ip}\nusername: ${user_name}\ncmd: ${actor_process_command_line}\nfilename: ${filename}\nfilepath:\n${filepath}\nhttps://www.virustotal.com/gui/file/${sha256}\n\nPlease help to verify if it is legitimate, if not please remove it and perform a full scan.\n`;
                 alertDescriptions.push(desc);
             }
             const toolbarSha256 = $('.aui-toolbar2-inner');
@@ -384,7 +454,12 @@ function cortexAlertHandler() {
                 let timelineURL;
                 switch (source) {
                     case 'Correlation':
-                        showFlag('error', '', `Source of the Alert is <strong>${source}</strong>, There is no Timeline on Cortex`, 'auto');
+                        showFlag(
+                            'error',
+                            '',
+                            `Source of the Alert is <strong>${source}</strong>, There is no Timeline on Cortex`,
+                            'auto'
+                        );
                         break;
                     default:
                         timelineURL = `${orgNavigator}forensic-timeline/alert_id/${alert_id}`;
@@ -408,7 +483,7 @@ function MDEAlertHandler() {
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, rawLog };
     }
-    const { LogSourceDomain, rawLog} = extractLog();
+    const { LogSourceDomain, rawLog } = extractLog();
     // console.info(`LogSourceDomain: ${LogSourceDomain}`);
     // console.info(`rawLog: ${rawLog}`);
 
@@ -418,22 +493,22 @@ function MDEAlertHandler() {
                 const { mde } = JSON.parse(log);
                 const { title, id, computerDnsName, relatedUser, evidence } = mde;
                 const alert = { title, id, computerDnsName };
-                const userName = relatedUser ? relatedUser.userName : "N/A";
-                let extrainfo = "";
+                const userName = relatedUser ? relatedUser.userName : 'N/A';
+                let extrainfo = '';
                 if (evidence) {
-                  const tmp = [];
-                  for (const evidenceItem of evidence) {
-                    if (evidenceItem.entityType === "File") {
-                      const description = `filename:${evidenceItem.fileName}\nfilePath:${evidenceItem.filePath}\nsha1:${evidenceItem.sha1}\n`;
-                      tmp.push(description);
+                    const tmp = [];
+                    for (const evidenceItem of evidence) {
+                        if (evidenceItem.entityType === 'File') {
+                            const description = `filename:${evidenceItem.fileName}\nfilePath:${evidenceItem.filePath}\nsha1:${evidenceItem.sha1}\n`;
+                            tmp.push(description);
+                        }
+                        if (evidenceItem.entityType === 'Process') {
+                            const description = `cmd:${evidenceItem.processCommandLine}\naccount:${evidenceItem.accountName}\nsha1:${evidenceItem.sha1}\n`;
+                            tmp.push(description);
+                        }
                     }
-                    if (evidenceItem.entityType === "Process") {
-                      const description = `cmd:${evidenceItem.processCommandLine}\naccount:${evidenceItem.accountName}\nsha1:${evidenceItem.sha1}\n`;
-                      tmp.push(description);
-                    }
-                }
-                const uniqueDescriptions = Array.from(new Set(tmp));
-                extrainfo = uniqueDescriptions.join("\n");
+                    const uniqueDescriptions = Array.from(new Set(tmp));
+                    extrainfo = uniqueDescriptions.join('\n');
                 }
                 acc.push({ ...alert, userName, extrainfo });
             } catch (error) {
@@ -457,7 +532,7 @@ function MDEAlertHandler() {
         alert(alertMsg);
     }
     function openMDE() {
-        let MDEURL = "";
+        let MDEURL = '';
         for (const info of alertInfo) {
             const { id } = info;
             if (id) {
@@ -483,14 +558,14 @@ function HTSCAlertHandler() {
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, rawLog };
     }
-    const { LogSourceDomain, rawLog} = extractLog();
+    const { LogSourceDomain, rawLog } = extractLog();
     // console.info(`LogSourceDomain: ${LogSourceDomain}`);
     // console.info(`rawLog: ${rawLog}`);
 
-    const parseLog = (rawLog) => {
+    const parseLog = rawLog => {
         const alertInfo = rawLog.reduce((acc, log) => {
             try {
-                const formatJson = log.substring(log.indexOf("{")).trim();
+                const formatJson = log.substring(log.indexOf('{')).trim();
                 // const logObj = JSON.parse(formatJson);
                 const logObj = JSON.parse(formatJson.replace(/\\\(n/g, '\\n('));
                 const eventEvidence = decodeHtml(logObj.event_evidence);
@@ -500,13 +575,13 @@ function HTSCAlertHandler() {
                     srcIP: logObj.src_ip,
                     eventEvidence,
                     hostName: logObj.hostName,
-                    dstIP: logObj.dst_ip,
+                    dstIP: logObj.dst_ip
                 };
                 acc.push(alert);
             } catch (error) {
                 console.error(`Error: ${error.message}`);
             }
-          return acc;
+            return acc;
         }, []);
         return alertInfo;
     };
@@ -528,29 +603,47 @@ function HTSCAlertHandler() {
 
 function CBAlertHandler() {
     console.log('#### Code CBAlertHandler run ####');
+    const { LogSourceDomain, rawLog } = extractLog();
+    var alertInfo;
+    if (LogSourceDomain == 'swireproperties') {
+        alertInfo = parseLeefLog(rawLog);
+    }
+    if (LogSourceDomain == 'jetco') {
+        alertInfo = parseCefLog(rawLog);
+    }
+
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, rawLog };
     }
-    const { LogSourceDomain, rawLog} = extractLog();
-    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
-    // console.info(`rawLog: ${rawLog}`);
 
-    function parseLog(rawLog) {
+    // For Swire
+    function parseLeefLog(rawLog) {
         const alertInfo = rawLog.reduce((acc, log) => {
             const cb_log = {};
             try {
-                const log_obj = log.split("\t");
-                log_obj.forEach((log_item) => {
+                const log_obj = log.split('\t');
+                log_obj.forEach(log_item => {
                     try {
-                        const [key, value] = log_item.split("=");
+                        const [key, value] = log_item.split('=');
                         cb_log[key] = value;
                     } catch (error) {
                         console.error(`Error: ${error.message}`);
                     }
                 });
-                acc.push({ AlertTitle: cb_log.watchlist_name, HostName: cb_log.computer_name, HostIp: cb_log.interface_ip, UserName: cb_log.username, CmdLine: cb_log.cmdline, CBlink: cb_log.link_process, Filepath: cb_log.path, Sha256: cb_log.process_sha256 });
+                if (log.trim() !== '') {
+                    acc.push({
+                        AlertTitle: cb_log.watchlist_name,
+                        HostName: cb_log.computer_name,
+                        HostIp: cb_log.interface_ip,
+                        UserName: cb_log.username,
+                        CmdLine: cb_log.cmdline,
+                        CBlink: cb_log.link_process,
+                        Filepath: cb_log.path,
+                        Sha256: cb_log.process_sha256
+                    });
+                }
             } catch (error) {
                 console.error(`Error: ${error.message}`);
             }
@@ -558,21 +651,83 @@ function CBAlertHandler() {
         }, []);
         return alertInfo;
     }
-    const alertInfo = parseLog(rawLog);
-    // console.info(`alertInfo: ${alertInfo}`);
+
+    // For Jetco and other CEF log tickets
+    function parseCefLog(rawLog) {
+        function cefToJson(cefLog) {
+            var json = {};
+            var fields = cefLog.split(' ');
+
+            for (var i = 0; i < fields.length; i++) {
+                var field = fields[i].split('=');
+                var key = field[0];
+                var value = field.slice(1).join('=');
+
+                if (value) {
+                    value = value.replace(/\\\\=/g, '=').replace(/\\\\s/g, ' ');
+
+                    if (key === 'filePath' || key === 'msg' || key === 'start' || key === 'rt') {
+                        var nextFieldIndex = i + 1;
+                        while (nextFieldIndex < fields.length && !fields[nextFieldIndex].includes('=')) {
+                            value += ' ' + fields[nextFieldIndex];
+                            nextFieldIndex++;
+                        }
+                    }
+                    json[key] = value;
+                }
+            }
+            return json;
+        }
+
+        const alertInfo = rawLog.reduce((acc, log) => {
+            try {
+                // Determine whether the log is empty
+                if (Object.keys(log).length !== 0) {
+                    // Split CEF log
+                    let cef_log = log.split('|');
+                    // Parsing CEF Header
+                    const cef_log_header = cef_log.slice(1, 7);
+                    // Parsing CEF Extends
+                    const cef_log_extends = cefToJson(cef_log[7]);
+
+                    acc.push({
+                        AlertTitle: cef_log_header[4],
+                        // for some like "server error" tickets
+                        HostName: cef_log_extends.dhost ? cef_log_extends.dhost : cef_log_extends.dvchost,
+                        HostIp: cef_log_extends.dst,
+                        UserName: cef_log_extends.duser,
+                        FileName: cef_log_extends.fname,
+                        FilePath: cef_log_extends.filePath,
+                        Sha256: cef_log_extends.fileHash,
+                        Msg: cef_log_extends.msg
+                    });
+                }
+                return acc;
+            } catch (error) {
+                console.error(`Error: ${error.message}`);
+            }
+        }, []);
+        return alertInfo;
+    }
 
     function generateDescription() {
         const alertDescriptions = [];
         for (const info of alertInfo) {
-            const { AlertTitle, HostName, HostIp, UserName, CmdLine, Filepath, Sha256 } = info;
-            const desc = `Observed ${AlertTitle}\nHost: ${HostName}  IP: ${HostIp}\nusername: ${UserName}\nCmdline: ${CmdLine}\nFilepath: ${Filepath}\nsha256: ${Sha256}\n\nPlease verify if the activity is legitimate.\n`;
+            const { AlertTitle } = info;
+            var desc = `Observed ${AlertTitle}\n`;
+            Object.entries(info).forEach(([index, value]) => {
+                if (value !== undefined && index != 'AlertTitle' && index != 'CBlink') {
+                    desc += `${index}: ${value}\n`;
+                }
+            });
+            desc += `\nPlease verify if the activity is legitimate.\n`;
             alertDescriptions.push(desc);
         }
         const alertMsg = [...new Set(alertDescriptions)].join('\n');
         alert(alertMsg);
-    };
+    }
     function openCB() {
-        let CBURL = "";
+        let CBURL = '';
         for (const info of alertInfo) {
             const { CBlink } = info;
             if (CBlink) {
@@ -585,15 +740,14 @@ function CBAlertHandler() {
     addButton('openCB', 'CB', openCB);
 }
 
-
-(function() {
+(function () {
     'use strict';
 
     registerSearchMenu();
     registerExceptionMenu();
 
     // Filter page: audio control registration and regular issues table update
-    if ((window.location.href.includes('filter=15200') || window.location.href.includes('filter=20404')) && !window.location.href.includes('MSS')) {
+    if (window.location.href.includes('filter=15200') && !window.location.href.includes('MSS')) {
         console.log('#### Code includes filter run ####');
         const NotifyControls = createNotifyControls();
 
@@ -617,7 +771,8 @@ function CBAlertHandler() {
                 'cortex-xdr-json': cortexAlertHandler,
                 'mde-api-json': MDEAlertHandler,
                 'sangfor-ccom-json': HTSCAlertHandler,
-                'CarbonBlack': CBAlertHandler
+                'CarbonBlack': CBAlertHandler,
+                'carbonblack_cef': CBAlertHandler
             };
             const DecoderName = $('#customfield_10807-val').text().trim();
             const handler = handlers[DecoderName];
