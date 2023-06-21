@@ -603,16 +603,19 @@ function HTSCAlertHandler() {
 
 function CBAlertHandler() {
     console.log('#### Code CBAlertHandler run ####');
+    const { LogSourceDomain, rawLog } = extractLog();
+    var alertInfo;
+    if (LogSourceDomain == 'swireproperties') {
+        alertInfo = parseLeefLog(rawLog);
+    }
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
         return { LogSourceDomain, rawLog };
     }
-    const { LogSourceDomain, rawLog } = extractLog();
-    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
-    // console.info(`rawLog: ${rawLog}`);
 
-    function parseLog(rawLog) {
+    // For Swire
+    function parseLeefLog(rawLog) {
         const alertInfo = rawLog.reduce((acc, log) => {
             const cb_log = {};
             try {
@@ -625,16 +628,18 @@ function CBAlertHandler() {
                         console.error(`Error: ${error.message}`);
                     }
                 });
-                acc.push({
-                    AlertTitle: cb_log.watchlist_name,
-                    HostName: cb_log.computer_name,
-                    HostIp: cb_log.interface_ip,
-                    UserName: cb_log.username,
-                    CmdLine: cb_log.cmdline,
-                    CBlink: cb_log.link_process,
-                    Filepath: cb_log.path,
-                    Sha256: cb_log.process_sha256
-                });
+                if (log.trim() !== '') {
+                    acc.push({
+                        AlertTitle: cb_log.watchlist_name,
+                        HostName: cb_log.computer_name,
+                        HostIp: cb_log.interface_ip,
+                        UserName: cb_log.username,
+                        CmdLine: cb_log.cmdline,
+                        CBlink: cb_log.link_process,
+                        Filepath: cb_log.path,
+                        Sha256: cb_log.process_sha256
+                    });
+                }
             } catch (error) {
                 console.error(`Error: ${error.message}`);
             }
@@ -642,14 +647,18 @@ function CBAlertHandler() {
         }, []);
         return alertInfo;
     }
-    const alertInfo = parseLog(rawLog);
-    // console.info(`alertInfo: ${alertInfo}`);
 
     function generateDescription() {
         const alertDescriptions = [];
         for (const info of alertInfo) {
-            const { AlertTitle, HostName, HostIp, UserName, CmdLine, Filepath, Sha256 } = info;
-            const desc = `Observed ${AlertTitle}\nHost: ${HostName}  IP: ${HostIp}\nusername: ${UserName}\nCmdline: ${CmdLine}\nFilepath: ${Filepath}\nsha256: ${Sha256}\n\nPlease verify if the activity is legitimate.\n`;
+            const { AlertTitle } = info;
+            var desc = `Observed ${AlertTitle}\n`;
+            Object.entries(info).forEach(([index, value]) => {
+                if (value !== undefined && index != 'AlertTitle' && index != 'CBlink') {
+                    desc += `${index}: ${value}\n`;
+                }
+            });
+            desc += `\nPlease verify if the activity is legitimate.\n`;
             alertDescriptions.push(desc);
         }
         const alertMsg = [...new Set(alertDescriptions)].join('\n');
