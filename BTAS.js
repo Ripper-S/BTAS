@@ -608,10 +608,6 @@ function CBAlertHandler() {
     if (LogSourceDomain == 'swireproperties') {
         alertInfo = parseLeefLog(rawLog);
     }
-    if (LogSourceDomain == 'jetco') {
-        alertInfo = parseCefLog(rawLog);
-    }
-
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
