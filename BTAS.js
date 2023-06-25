@@ -767,7 +767,8 @@ function CBAlertHandler() {
                 'cortex-xdr-json': cortexAlertHandler,
                 'mde-api-json': MDEAlertHandler,
                 'sangfor-ccom-json': HTSCAlertHandler,
-                'CarbonBlack': CBAlertHandler
+                'CarbonBlack': CBAlertHandler,
+                'carbonblack_cef': CBAlertHandler
             };
             const DecoderName = $('#customfield_10807-val').text().trim();
             const handler = handlers[DecoderName];
