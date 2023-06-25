@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         BTAS-Beta
-// @namespace    https://github.com/Dyebasedink/BTAS.git
-// @homepageURL  https://github.com/Dyebasedink/BTAS.git
+// @namespace    https://github.com/Ripper-S/BTAS
+// @homepageURL  https://github.com/Ripper-S/BTAS
 // @version      1.3.1
-// @description  BTAS Beta Release Channels
+// @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
-// @updateURL    https://greasyfork.org/scripts/469395-btas/code/BTAS.user.js
-// @downloadURL  https://greasyfork.org/scripts/469395-btas/code/BTAS.user.js
+// @updateURL    https://greasyfork.org/scripts/463908-btas/code/BTAS.user.js
+// @downloadURL  https://greasyfork.org/scripts/463908-btas/code/BTAS.user.js
 // @match        https://caas.pwchk.com/*
 // @icon         https://www.google.com/s2/favicons?domain=pwchk.com
 // @require      https://code.jquery.com/jquery-3.6.4.min.js
