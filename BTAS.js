@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         BTAS-Beta
+// @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
 // @version      1.3.1
