@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.3.1
+// @version      1.3.2
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
@@ -603,15 +603,7 @@ function HTSCAlertHandler() {
 
 function CBAlertHandler() {
     console.log('#### Code CBAlertHandler run ####');
-    const { LogSourceDomain, rawLog } = extractLog();
-    var alertInfo;
-    if (LogSourceDomain == 'swireproperties') {
-        alertInfo = parseLeefLog(rawLog);
-    }
-    if (LogSourceDomain == 'jetco') {
-        alertInfo = parseCefLog(rawLog);
-    }
-    
+
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
@@ -710,6 +702,16 @@ function CBAlertHandler() {
         return alertInfo;
     }
 
+    const { LogSourceDomain, rawLog } = extractLog();
+    let alertInfo;
+    if (LogSourceDomain == 'swireproperties') {
+        alertInfo = parseLeefLog(rawLog);
+    } else if (LogSourceDomain == 'jetco') {
+        alertInfo = parseCefLog(rawLog);
+    } else {
+        alertInfo = '';
+    }
+    
     function generateDescription() {
         const alertDescriptions = [];
         for (const info of alertInfo) {
