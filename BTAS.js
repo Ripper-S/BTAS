@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.3.1
+// @version      1.3.2
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
@@ -548,7 +548,7 @@ function MDEAlertHandler() {
 function HTSCAlertHandler() {
     console.log('#### Code HTSCAlertHandler run ####');
     function decodeHtml(encodedString) {
-        var tmpElement = document.createElement('span');
+        const tmpElement = document.createElement('span');
         tmpElement.innerHTML = encodedString;
         return tmpElement.innerText;
     }
@@ -603,15 +603,7 @@ function HTSCAlertHandler() {
 
 function CBAlertHandler() {
     console.log('#### Code CBAlertHandler run ####');
-    const { LogSourceDomain, rawLog } = extractLog();
-    var alertInfo;
-    if (LogSourceDomain == 'swireproperties') {
-        alertInfo = parseLeefLog(rawLog);
-    }
-    if (LogSourceDomain == 'jetco') {
-        alertInfo = parseCefLog(rawLog);
-    }
-    
+
     function extractLog() {
         const LogSourceDomain = $('#customfield_10223-val').text().trim();
         let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
@@ -655,19 +647,19 @@ function CBAlertHandler() {
     // For Jetco and other CEF log tickets
     function parseCefLog(rawLog) {
         function cefToJson(cefLog) {
-            var json = {};
-            var fields = cefLog.split(' ');
+            let json = {};
+            let fields = cefLog.split(' ');
 
-            for (var i = 0; i < fields.length; i++) {
-                var field = fields[i].split('=');
-                var key = field[0];
-                var value = field.slice(1).join('=');
+            for (let i = 0; i < fields.length; i++) {
+                let field = fields[i].split('=');
+                let key = field[0];
+                let value = field.slice(1).join('=');
 
                 if (value) {
                     value = value.replace(/\\\\=/g, '=').replace(/\\\\s/g, ' ');
 
                     if (key === 'filePath' || key === 'msg' || key === 'start' || key === 'rt') {
-                        var nextFieldIndex = i + 1;
+                        let nextFieldIndex = i + 1;
                         while (nextFieldIndex < fields.length && !fields[nextFieldIndex].includes('=')) {
                             value += ' ' + fields[nextFieldIndex];
                             nextFieldIndex++;
@@ -710,11 +702,21 @@ function CBAlertHandler() {
         return alertInfo;
     }
 
+    const { LogSourceDomain, rawLog } = extractLog();
+    let alertInfo;
+    if (LogSourceDomain == 'swireproperties') {
+        alertInfo = parseLeefLog(rawLog);
+    } else if (LogSourceDomain == 'jetco') {
+        alertInfo = parseCefLog(rawLog);
+    } else {
+        alertInfo = '';
+    }
+
     function generateDescription() {
         const alertDescriptions = [];
         for (const info of alertInfo) {
             const { AlertTitle } = info;
-            var desc = `Observed ${AlertTitle}\n`;
+            let desc = `Observed ${AlertTitle}\n`;
             Object.entries(info).forEach(([index, value]) => {
                 if (value !== undefined && index != 'AlertTitle' && index != 'CBlink') {
                     desc += `${index}: ${value}\n`;
