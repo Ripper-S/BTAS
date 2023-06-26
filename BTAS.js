@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         BTAS-Beta
+// @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
 // @version      1.3.2
-// @description  BTAS Beta Release Channel
+// @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
 // @updateURL    https://greasyfork.org/scripts/463908-btas/code/BTAS.user.js
