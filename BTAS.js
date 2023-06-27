@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.3.2
+// @version      1.3.3
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
@@ -47,6 +47,7 @@ function registerSearchMenu() {
                 '%22Log%20Source%20Domain%22%20~%20%22%D%22%20' +
                 'ORDER%20BY%20created%20DESC'
         },
+        { name: 'Reputation', url: 'https://172.18.2.23/instance/execute/reputation/ip?ip=%s' },
         { name: 'VT', url: 'https://www.virustotal.com/gui/search/%s' },
         { name: 'AbuseIPDB', url: 'https://www.abuseipdb.com/check/%s' }
     ];
