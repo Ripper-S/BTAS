@@ -2,7 +2,7 @@
 // @name         BTAS-Beta
 // @namespace    https://github.com/Dyebasedink/BTAS/tree/Beta
 // @homepageURL  https://github.com/Dyebasedink/BTAS/tree/Beta
-// @version      1.3.2
+// @version      1.3.3
 // @description  BTAS Beta Release Channel
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
