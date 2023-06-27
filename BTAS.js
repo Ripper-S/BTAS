@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         BTAS-Beta
-// @namespace    https://github.com/Ripper-S/BTAS
-// @homepageURL  https://github.com/Ripper-S/BTAS
+// @namespace    https://github.com/Dyebasedink/BTAS/tree/Beta
+// @homepageURL  https://github.com/Dyebasedink/BTAS/tree/Beta
 // @version      1.3.2
 // @description  BTAS Beta Release Channel
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
-// @updateURL    https://greasyfork.org/scripts/463908-btas/code/BTAS.user.js
-// @downloadURL  https://greasyfork.org/scripts/463908-btas/code/BTAS.user.js
+// @updateURL    https://greasyfork.org/zh-CN/scripts/469395-btas/code
+// @downloadURL  https://greasyfork.org/zh-CN/scripts/469395-btas/code
 // @match        https://caas.pwchk.com/*
 // @icon         https://www.google.com/s2/favicons?domain=pwchk.com
 // @require      https://code.jquery.com/jquery-3.6.4.min.js
