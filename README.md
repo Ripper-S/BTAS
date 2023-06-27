@@ -2,7 +2,7 @@
 
 > Blue Team Assistance Script
 
-**BTAS** is being developed by Barry & Jack
+**BTAS** is being developed by Barry & Jack & Xingyu
 
 [中文版本(Chinese version)](README.zh-cn.md)
 
