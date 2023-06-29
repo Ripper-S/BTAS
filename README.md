@@ -2,7 +2,7 @@
 
 > Blue Team Assistance Script
 
-**BTAS** is being developed by Barry & Jack
+**BTAS** is being developed by Barry & Jack & Xingyu
 
 [中文版本(Chinese version)](README.zh-cn.md)
 
@@ -12,6 +12,10 @@
 You can use Greasy Fork to install and update BTAS scripts, as follows:
 
 https://greasyfork.org/en/scripts/463908-btas
+
+If you want to experience the latest features or help us test the program, you can install the BTAS Beta version. Click on the following link: 
+
+https://greasyfork.org/en/scripts/469395-btas-beta
 
 
 ## Features
@@ -24,7 +28,7 @@ https://greasyfork.org/en/scripts/463908-btas
 - Architecture: Refactor the code as a whole, abstract functions, reduce code reuse.
 
 ### Tampermonkey Menu Command
-- When selecting text with the mouse, clicking on the Tampermonkey icon in the upper right corner will call Jira, VT, and AbuseIPDB for searching.
+- When selecting text with the mouse, clicking on the Tampermonkey icon in the upper right corner will call Jira, Reputation, VT, and AbuseIPDB for searching.
 
 - If you encounter a ticket that cannot be processed temporarily, but you don't want it to keep ringing in the filter queue, you can select the issue key with the mouse, and then click on the Tampermonkey icon in the upper right corner to call Add Exception to add an exception. Clear Exception is to clear all exceptions.
 
@@ -47,7 +51,7 @@ https://greasyfork.org/en/scripts/463908-btas
 
 
 ## Contribution
-Developed by Barry before version 0.93, and refactored by Jack for version 1.0.1 and responsible for subsequent development and maintenance
+Developed by Barry before version 0.93, and refactored by Jack for version 1.0.1 and responsible for subsequent development and maintenance. Xingyu will be actively engaged in the development tasks following the release of version 1.3.2
 
 
 ## License
