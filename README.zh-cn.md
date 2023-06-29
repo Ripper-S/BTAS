@@ -3,14 +3,17 @@
 
 > Blue Team Assistance Script
 
-**BTAS** is being developed by Barry & Jack
+**BTAS** is being developed by Barry & Jack & Xingyu
 
 
-## Installation & Usage
-You can use Greasy Fork to install and update BTAS scripts, as follows:
+## 安装 & 使用
+你可以使用 Greasy Fork 安装和更新BTAS脚本，点击下列地址:
 
 https://greasyfork.org/en/scripts/463908-btas
 
+如果你想体验最新的功能，或者帮助我们测试程序，你可以安装BTAS Beta版本，点击下列地址:
+
+https://greasyfork.org/zh-CN/scripts/469395-btas-beta
 
 ## Difference: 蓝队增强 & BTAS
 
@@ -23,9 +26,11 @@ https://greasyfork.org/en/scripts/463908-btas
 
 ### 油猴图标按键
 - 功能介绍：
-    - 鼠标选中文本，右键或点击右上角油猴图标，即可调用Jira, VT, AbuseIPDB进行搜索
+    - 鼠标选中文本，右键或点击右上角油猴图标，即可调用Jira, VT, Reputation, AbuseIPDB进行搜索
     - 如果遇到暂时无法处理的ticket，但是又并不希望因为filter队列里有它而持续响铃，可以鼠标选中issue key，然后右键或点击右上角油猴图标，调用Add Exception添加例外，Clear Exception则是清除所有例外
 
+- 添加：增加Reputation搜索功能，通过XSOAR平台查询IP声誉值
+  
 - 重构：将注册多个油猴菜单的功能，用数组整合搜索引擎，一次性循环注册解决
 
 - 移除：微步搜索引擎是中文界面，不利于用户体验，已移除
@@ -56,11 +61,11 @@ https://greasyfork.org/en/scripts/463908-btas
 
 - 优化：创建cortex平台客户和导航的对象，方便后续添加客户和维护
 
-- 修复：每点一次Description都会追加hash文本的问题已修复；welab等新客户Card无法跳转的问题已修复；HTSC部分ticket的Description为空白已修复；
+- 修复：每点一次Description都会追加hash文本的问题已修复；welab等新客户Card无法跳转的问题已修复；HTSC部分ticket的Description为空白已修复；Carbonblack平台Description undefined已修复
 
 
 ## Contribution
-Developed by Barry before version 0.93, and refactored by Jack for version 1.0.1 and responsible for subsequent development and maintenance
+Developed by Barry before version 0.93, and refactored by Jack for version 1.0.1 and responsible for subsequent development and maintenance, Xingyu will be involved in the development work after version 1.3.2
 
 
 ## License
