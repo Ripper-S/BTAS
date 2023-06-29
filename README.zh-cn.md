@@ -64,9 +64,9 @@ https://greasyfork.org/zh-CN/scripts/469395-btas-beta
 - 修复：每点一次Description都会追加hash文本的问题已修复；welab等新客户Card无法跳转的问题已修复；HTSC部分ticket的Description为空白已修复；Carbonblack平台Description undefined已修复
 
 
-## Contribution
-Developed by Barry before version 0.93, and refactored by Jack for version 1.0.1 and responsible for subsequent development and maintenance, Xingyu will be involved in the development work after version 1.3.2
+## 贡献
+由Barry在0.93版本之前开发，并由Jack在1.0.1版本进行了重构，并负责后续的开发和维护工作，Xingyu将在1.3.2版本之后参与开发工作。
 
 
-## License
+## 许可证
 License: Apache License 2.0
