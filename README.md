@@ -54,9 +54,10 @@ https://greasyfork.org/en/scripts/469395-btas-beta
 
 ### High-Risk Keyword Check
 - Function introduction
+  
     - When high-risk keywords such as "mimikatz" are detected in the log, a reminder will pop up saying "Please double-check it, and if it seems suspicious, contact L2 or TL."
+      
 - Optimization: Abstract the high-risk keyword checking functionality into a function to facilitate future development and maintenance.
-
 
 ### Log Summary and Security Platform Shortcut Keys
 - Function Introduction
