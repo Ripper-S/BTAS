@@ -6,11 +6,15 @@
 
 **BTAS** is being developed by Barry & Jack & Xingyu
 
-## Installation & Usage
 
-You can use Greasy Fork to install and update BTAS scripts, as follows:
+## 安装 & 使用
+你可以使用 Greasy Fork 安装和更新BTAS脚本，点击下列地址:
 
 https://greasyfork.org/en/scripts/463908-btas
+
+如果你想体验最新的功能，或者帮助我们测试程序，你可以安装BTAS Beta版本，点击下列地址:
+
+https://greasyfork.org/zh-CN/scripts/469395-btas-beta
 
 ## Difference: 蓝队增强 & BTAS
 
@@ -23,8 +27,13 @@ https://greasyfork.org/en/scripts/463908-btas
 -   架构：对代码整体进行重构，抽象函数，减少代码复用，细节如下
 
 ### 油猴图标按键
+- 功能介绍：
+    - 鼠标选中文本，右键或点击右上角油猴图标，即可调用Jira, VT, Reputation, AbuseIPDB进行搜索
+    - 如果遇到暂时无法处理的ticket，但是又并不希望因为filter队列里有它而持续响铃，可以鼠标选中issue key，然后右键或点击右上角油猴图标，调用Add Exception添加例外，Clear Exception则是清除所有例外
 
--   功能介绍：
+- 添加：增加Reputation搜索功能，通过XSOAR平台查询IP声誉值
+  
+- 重构：将注册多个油猴菜单的功能，用数组整合搜索引擎，一次性循环注册解决
 
     -   鼠标选中文本，右键或点击右上角油猴图标，即可调用 Jira, VT, AbuseIPDB 进行搜索
     -   如果遇到暂时无法处理的 ticket，但是又并不希望因为 filter 队列里有它而持续响铃，可以鼠标选中 issue key，然后右键或点击右上角油猴图标，调用 Add Exception 添加例外，Clear Exception 则是清除所有例外
@@ -61,16 +70,15 @@ https://greasyfork.org/en/scripts/463908-btas
         -   Description：日志摘要信息
         -   Card，Timeline：Alter 对应安全平台的快捷跳转或 URL 信息
 
--   重构：将信息摘要，平台跳转功能抽象成函数，增强可读性；抽象添加按钮函数，减少重复代码，更加简洁
+- 修复：每点一次Description都会追加hash文本的问题已修复；welab等新客户Card无法跳转的问题已修复；HTSC部分ticket的Description为空白已修复；Carbonblack平台Description undefined已修复
 
 -   优化：创建 cortex 平台客户和导航的对象，方便后续添加客户和维护
 
 -   修复：每点一次 Description 都会追加 hash 文本的问题已修复；welab 等新客户 Card 无法跳转的问题已修复；HTSC 部分 ticket 的 Description 为空白已修复；
 
-## Contribution
+## 贡献
+由Barry在0.93版本之前开发，并由Jack在1.0.1版本进行了重构，并负责后续的开发和维护工作，Xingyu将在1.3.2版本之后参与开发工作。
 
-Developed by Barry before version 0.93, and refactored by Jack for version 1.0.1 and responsible for subsequent development and maintenance
 
-## License
-
+## 许可证
 License: Apache License 2.0

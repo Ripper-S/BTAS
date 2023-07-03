@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         BTAS-Beta
-// @namespace    https://github.com/Dyebasedink/BTAS/tree/Beta
-// @homepageURL  https://github.com/Dyebasedink/BTAS/tree/Beta
-// @version      1.3.3
-// @description  BTAS Beta Release Channel
+// @name         BTAS
+// @namespace    https://github.com/Ripper-S/BTAS
+// @homepageURL  https://github.com/Ripper-S/BTAS
+// @version      1.4.1
+// @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
 // @updateURL    https://greasyfork.org/zh-CN/scripts/469395-btas/code
