@@ -262,6 +262,18 @@ function editNotify() {
             }
         }
     }
+    // # Add a click event listener to the "Edit" button for plwazag tickets
+    if (LogSource.includes('plwazag')) {
+        $('#edit-issue').on('click', () => {
+            showFlag(
+                'warning',
+                'plwazag ticket',
+                'When processing a ticket containing "plwazag" in the Log Source<br>\
+                    Please do NOT escalate to the customer and contact Dev Team first to confirm if it is due to their operatation',
+                'manual'
+            );
+        });
+    }
     addEditonClick();
 
     function generateEditnotify() {
@@ -743,6 +755,69 @@ function CBAlertHandler() {
     addButton('openCB', 'CB', openCB);
 }
 
+function WineventAlertHandler() {
+    console.log('#### Code WineventAlertHandler run ####');
+    function extractLog() {
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
+        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
+        return { LogSourceDomain, rawLog };
+    }
+    const { LogSourceDomain, rawLog } = extractLog();
+
+    function parseLog(rawLog) {
+        const alertInfo = rawLog.reduce((acc, log) => {
+            try {
+                const { win } = JSON.parse(log);
+                const { eventdata, system } = win;
+                let alertTitle = system.message.split('\r\n')[0].replace(/[".]/g, '');
+                alertTitle = alertTitle
+                    .split(' ')
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+                const alertHost = system.computer;
+                const alertExtraInfo = {
+                    UserName: eventdata.subjectUserName,
+                    TargetUserName: eventdata.targetUserName,
+                    Member: eventdata.memberName,
+                    Process: eventdata.newProcessName,
+                    Command: eventdata.commandLine,
+                    ParentProcess: eventdata.parentProcessName,
+                    IP: eventdata.ipAddress,
+                    ObjectDN: eventdata.objectDN,
+                    ObjectGUID: eventdata.objectGUID
+                };
+                acc.push({ alertTitle, alertHost, alertExtraInfo });
+            } catch (error) {
+                console.error(`Error: ${error.message}`);
+            }
+            return acc;
+        }, []);
+        return alertInfo;
+    }
+    const alertInfo = parseLog(rawLog);
+
+    function generateDescription() {
+        const alertDescriptions = [];
+        for (const info of alertInfo) {
+            let desc = `Observed ${info.alertTitle}\nHost: ${info.alertHost}\n`;
+            for (const key in info.alertExtraInfo) {
+                if (Object.hasOwnProperty.call(info.alertExtraInfo, key)) {
+                    const value = info.alertExtraInfo[key];
+                    if (value !== undefined) {
+                        desc += `${key}: ${value}\n`;
+                    }
+                }
+            }
+            desc += '\n' + 'Please help to verify if this activity is legitimate.' + '\n';
+            alertDescriptions.push(desc);
+        }
+        const alertMsg = [...new Set(alertDescriptions)].join('\n');
+        alert(alertMsg);
+    }
+
+    addButton('generateDescription', 'Description', generateDescription);
+}
+
 (function () {
     'use strict';
 
@@ -775,7 +850,8 @@ function CBAlertHandler() {
                 'mde-api-json': MDEAlertHandler,
                 'sangfor-ccom-json': HTSCAlertHandler,
                 'CarbonBlack': CBAlertHandler,
-                'carbonblack_cef': CBAlertHandler
+                'carbonblack_cef': CBAlertHandler,
+                'windows_eventchannel': WineventAlertHandler
             };
             const DecoderName = $('#customfield_10807-val').text().trim();
             const handler = handlers[DecoderName];
