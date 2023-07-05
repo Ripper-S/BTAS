@@ -35,9 +35,6 @@ https://greasyfork.org/en/scripts/469395-btas-beta
   
 - Addition: Integrate Reputation search functionality, enabling IP reputation value queries through the XSOAR platform.
 
-- Refactoring: Consolidate the functionality of registering multiple Greasy Monkey menus into an array-based search engine, allowing for a one-time loop registration solution.
-
-- Removal: The Weibu search engine has been removed as it had a Chinese interface, which was not conducive to user experience.
 
 ### Notification Controls
 **Only supports List View (the default mode on the filter page).**
@@ -47,10 +44,6 @@ https://greasyfork.org/en/scripts/469395-btas-beta
     - **keepNotify** is for keeping the notification sound. It regularly refreshes the filter list and plays the notification sound as long as there are unfinished tickets.
 
     - **prompt** is for turning on banner notifications. It regularly refreshes the filter list and displays a banner notification if there are tickets with customer responses that have not been processed for more than 30 minutes.
-
-- Refactoring: Abstract the audio control and checkbox functionalities into functions. Integrate multiple alert sound components into a single object as a return value, facilitating subsequent calls.
-
-- Removal: Due to the interruption caused by periodic filter list refresh when upgrading tickets in Edit mode under Detail View, resulting in the loss of entered description information, the alert sound component now does not support Detail View and only supports List View (the default mode on the filter page).
 
 ### High-Risk Keyword Check
 - Function introduction
@@ -64,12 +57,6 @@ https://greasyfork.org/en/scripts/469395-btas-beta
     - In the specific MSS-ticket interface, add Description, Card, and Timeline buttons to the toolbar.
         - Description: Log summary information.
         - Card, Timeline: Shortcut jumps or URL information to the corresponding security platform in Alter.
-
-- Refactoring: Abstract the information summary and platform navigation functionalities into functions to improve readability. Abstract the add button function to reduce duplicate code and make it more concise.
-
-- Optimization: Create objects for Cortex platform clients and navigation to facilitate adding clients and maintenance in the future.
-
-- Bug Fixes: The issue of appending hash text every time Description is clicked has been resolved. The problem of not being able to navigate to new client cards such as Welab has been fixed. The issue of blank Description for certain tickets in HTSC has been resolved. The problem of "Description undefined" on the Carbonblack platform has been fixed.
 
 
 ## Contribution
