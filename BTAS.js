@@ -262,6 +262,19 @@ function editNotify() {
             }
         }
     }
+    // # Add a click event listener to the "Edit" button for plwazag tickets
+    if (LogSource.includes('plwazag')) {
+        $('#edit-issue').on('click', () => {
+            showFlag(
+                'warning',
+                'Log Source contains plwazag',
+                'When processing a ticket containing "plwazag" in the Log Source<br>\
+                        Please do NOT escalate to the customer and contact Dev Team via Teams Conversation first to confirm if it is due to their operatation',
+                'manual'
+            );
+        });
+    }
+
     addEditonClick();
 
     function generateEditnotify() {
