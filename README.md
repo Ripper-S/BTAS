@@ -57,6 +57,7 @@ https://greasyfork.org/en/scripts/469395-btas-beta
         - Description: Log summary information.
         - Card, Timeline: Shortcut jumps or URL information to the corresponding security platform in Alter.
 
+
 ## Contribution
 Developed by Barry before version 0.93, and refactored by Jack for version 1.0.1 and responsible for subsequent development and maintenance. Xingyu will be actively engaged in the development tasks following the release of version 1.3.2
 
