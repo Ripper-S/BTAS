@@ -35,6 +35,7 @@ https://greasyfork.org/en/scripts/469395-btas-beta
   
 - Addition: Integrate Reputation search functionality, enabling IP reputation value queries through the XSOAR platform.
 
+
 ### Notification Controls
 **Only supports List View (the default mode on the filter page).**
 - Function introduction
