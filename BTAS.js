@@ -274,6 +274,7 @@ function editNotify() {
             );
         });
     }
+
     addEditonClick();
 
     function generateEditnotify() {
