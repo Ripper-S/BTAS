@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.4.1
+// @version      1.4.4
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
@@ -207,36 +207,29 @@ function editNotify() {
         Check if additional Participants need to be added through HK_MSS_SOP.doc',
         'lsh-hk':
             'Please escalated according to the Label tags and document.<br>\
-        http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
+        http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
+        'plwazag':
+            'When processing a ticket containing "plwazag" in the Log Source<br>\
+        Please do NOT escalate to the customer and contact Dev Team via Teams Conversation first to confirm if it is due to their operatation',
+        'LogCollector':
+            'When processing a ticket containing "LogCollector" in the Log Source<br>\
+        Please do NOT escalate to the customer and contact Dev Team via Teams Conversation first to confirm if it is due to their operatation'
     };
     const LogSourceDomain = $('#customfield_10223-val').text().trim();
-    const orgNotify = orgNotifydict[LogSourceDomain];
     const Labels = $('.labels-wrap .labels li a span').text();
     const LogSource = $('#customfield_10204-val').text().trim();
     function addEditonClick() {
-        // # Add a click event listener to the "Edit" button
+        // # Add a click event listener to the "Edit" button related to the "LogSourceDomain" field
         if (
             LogSourceDomain.includes('esf') ||
             LogSourceDomain.includes('swireproperties') ||
             LogSourceDomain.includes('lsh-hk')
         ) {
+            const orgNotify = orgNotifydict[LogSourceDomain];
             $('#edit-issue').on('click', () => {
                 showFlag('warning', `${LogSourceDomain} ticket`, `${orgNotify}`, 'manual');
             });
         }
-        // # Add a click event listener to the "Edit" button for LogCollector tickets
-        if (LogSource.includes('LogCollector')) {
-            $('#edit-issue').on('click', () => {
-                showFlag(
-                    'warning',
-                    'LogCollector ticket',
-                    'When processing a ticket containing "LogCollector" in the Log Source<br>\
-                Please do NOT escalate to the customer and contact Jones/Franky first to confirm if it is due to other reasons',
-                    'manual'
-                );
-            });
-        }
-        // # Add a click event listener to the "Edit" button for kerrypropshk tickets
         if (LogSourceDomain.includes('kerrypropshk')) {
             if (Labels === 'UnassignedGroup') {
                 $('#edit-issue').on('click', () => {
@@ -261,16 +254,12 @@ function editNotify() {
                 });
             }
         }
-        // # Add a click event listener to the "Edit" button for plwazag tickets
-        if (LogSource.includes('plwazag')) {
+        // # Add a click event listener to the "Edit" button related to the "LogSource" field
+        if (LogSource.includes('plwazag') || LogSource.includes('LogCollector')) {
+            const keyLS = LogSource.includes('plwazag') ? 'plwazag' : LogSource;
+            const orgNotify = orgNotifydict[keyLS];
             $('#edit-issue').on('click', () => {
-                showFlag(
-                    'error',
-                    'Log Source contains plwazag',
-                    'When processing a ticket containing "plwazag" in the Log Source<br>\
-                        Please do NOT escalate to the customer and contact Dev Team via Teams Conversation first to confirm if it is due to their operatation',
-                    'manual'
-                );
+                showFlag('warning', `${keyLS} ticket`, `${orgNotify}`, 'manual');
             });
         }
     }
@@ -756,6 +745,68 @@ function CBAlertHandler() {
     addButton('openCB', 'CB', openCB);
 }
 
+function WineventAlertHandler() {
+    console.log('#### Code WineventAlertHandler run ####');
+    function extractLog() {
+        const LogSourceDomain = $('#customfield_10223-val').text().trim();
+        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
+        return { LogSourceDomain, rawLog };
+    }
+    const { LogSourceDomain, rawLog } = extractLog();
+
+    function parseLog(rawLog) {
+        const alertInfo = rawLog.reduce((acc, log) => {
+            try {
+                const { win } = JSON.parse(log);
+                const { eventdata, system } = win;
+                const alertTitle = $('#summary-val')
+                    .text()
+                    .trim()
+                    .replace(/[\[(].*?[\])]/g, '');
+                const alertHost = system.computer;
+                const alertExtraInfo = {
+                    UserName: eventdata.subjectUserName,
+                    TargetUserName: eventdata.targetUserName,
+                    Member: eventdata.memberName,
+                    Process: eventdata.newProcessName,
+                    Command: eventdata.commandLine,
+                    ParentProcess: eventdata.parentProcessName,
+                    IP: eventdata.ipAddress,
+                    ObjectDN: eventdata.objectDN,
+                    ObjectGUID: eventdata.objectGUID
+                };
+                acc.push({ alertTitle, alertHost, alertExtraInfo });
+            } catch (error) {
+                console.error(`Error: ${error.message}`);
+            }
+            return acc;
+        }, []);
+        return alertInfo;
+    }
+    const alertInfo = parseLog(rawLog);
+
+    function generateDescription() {
+        const alertDescriptions = [];
+        for (const info of alertInfo) {
+            let desc = `Observed${info.alertTitle}\nHost: ${info.alertHost}\n`;
+            for (const key in info.alertExtraInfo) {
+                if (Object.hasOwnProperty.call(info.alertExtraInfo, key)) {
+                    const value = info.alertExtraInfo[key];
+                    if (value !== undefined) {
+                        desc += `${key}: ${value}\n`;
+                    }
+                }
+            }
+            desc += '\n' + 'Please help to verify if this activity is legitimate.' + '\n';
+            alertDescriptions.push(desc);
+        }
+        const alertMsg = [...new Set(alertDescriptions)].join('\n');
+        alert(alertMsg);
+    }
+
+    addButton('generateDescription', 'Description', generateDescription);
+}
+
 (function () {
     'use strict';
 
@@ -788,7 +839,8 @@ function CBAlertHandler() {
                 'mde-api-json': MDEAlertHandler,
                 'sangfor-ccom-json': HTSCAlertHandler,
                 'CarbonBlack': CBAlertHandler,
-                'carbonblack_cef': CBAlertHandler
+                'carbonblack_cef': CBAlertHandler,
+                'windows_eventchannel': WineventAlertHandler
             };
             const DecoderName = $('#customfield_10807-val').text().trim();
             const handler = handlers[DecoderName];
