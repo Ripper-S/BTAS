@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.4.5
+// @version      1.4.6
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
@@ -829,10 +829,8 @@ function WineventAlertHandler() {
 
     // Issue page: Alert Handler
     setInterval(() => {
-        if ($('#issue-content').length && !$('#generateDescription').length && !$('.aui-banner-error').length) {
+        if ($('#issue-content').length && !$('#generateDescription').length) {
             console.log('#### Code Issue page: Alert Handler ####');
-            checkKeywords();
-
             const handlers = {
                 'cortex-xdr-json': cortexAlertHandler,
                 'mde-api-json': MDEAlertHandler,
@@ -846,6 +844,14 @@ function WineventAlertHandler() {
             if (handler) {
                 handler();
             }
+        }
+    }, 3000);
+
+    // Issue page: check Keywords
+    setInterval(() => {
+        if ($('#issue-content').length && !$('.aui-banner-error').length) {
+            console.log('#### Code Issue page: check Keywords ####');
+            checkKeywords();
         }
     }, 3000);
 
