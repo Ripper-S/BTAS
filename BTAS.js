@@ -481,14 +481,6 @@ function cortexAlertHandler() {
 
 function MDEAlertHandler() {
     console.log('#### Code MDEAlertHandler run ####');
-    function extractLog() {
-        const LogSourceDomain = $('#customfield_10223-val').text().trim();
-        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { LogSourceDomain, rawLog };
-    }
-    const { LogSourceDomain, rawLog } = extractLog();
-    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
-    // console.info(`rawLog: ${rawLog}`);
 
     function parseLog(rawLog) {
         const alertInfo = rawLog.reduce((acc, log) => {
@@ -550,20 +542,12 @@ function MDEAlertHandler() {
 
 function HTSCAlertHandler() {
     console.log('#### Code HTSCAlertHandler run ####');
+
     function decodeHtml(encodedString) {
         const tmpElement = document.createElement('span');
         tmpElement.innerHTML = encodedString;
         return tmpElement.innerText;
     }
-
-    function extractLog() {
-        const LogSourceDomain = $('#customfield_10223-val').text().trim();
-        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { LogSourceDomain, rawLog };
-    }
-    const { LogSourceDomain, rawLog } = extractLog();
-    // console.info(`LogSourceDomain: ${LogSourceDomain}`);
-    // console.info(`rawLog: ${rawLog}`);
 
     const parseLog = (rawLog) => {
         const alertInfo = rawLog.reduce((acc, log) => {
@@ -606,12 +590,6 @@ function HTSCAlertHandler() {
 
 function CBAlertHandler() {
     console.log('#### Code CBAlertHandler run ####');
-
-    function extractLog() {
-        const LogSourceDomain = $('#customfield_10223-val').text().trim();
-        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { LogSourceDomain, rawLog };
-    }
 
     // For Swire
     function parseLeefLog(rawLog) {
@@ -705,7 +683,6 @@ function CBAlertHandler() {
         return alertInfo;
     }
 
-    const { LogSourceDomain, rawLog } = extractLog();
     let alertInfo;
     if (LogSourceDomain == 'swireproperties') {
         alertInfo = parseLeefLog(rawLog);
@@ -747,12 +724,6 @@ function CBAlertHandler() {
 
 function WineventAlertHandler() {
     console.log('#### Code WineventAlertHandler run ####');
-    function extractLog() {
-        const LogSourceDomain = $('#customfield_10223-val').text().trim();
-        let rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
-        return { LogSourceDomain, rawLog };
-    }
-    const { LogSourceDomain, rawLog } = extractLog();
 
     function parseLog(rawLog) {
         const alertInfo = rawLog.reduce((acc, log) => {
@@ -843,6 +814,8 @@ function WineventAlertHandler() {
                 'windows_eventchannel': WineventAlertHandler
             };
             const DecoderName = $('#customfield_10807-val').text().trim();
+            const LogSourceDomain = $('#customfield_10223-val').text().trim();
+            const rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
             const handler = handlers[DecoderName];
             if (handler) {
                 handler();
