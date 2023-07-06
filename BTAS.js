@@ -15,6 +15,8 @@
 // @grant        GM_unregisterMenuCommand
 // ==/UserScript==
 var $ = window.jQuery;
+const LogSourceDomain = $('#customfield_10223-val').text().trim();
+const rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
 
 /**
  * This function creates and displays a flag using AJS.flag function
@@ -814,8 +816,7 @@ function WineventAlertHandler() {
                 'windows_eventchannel': WineventAlertHandler
             };
             const DecoderName = $('#customfield_10807-val').text().trim();
-            const LogSourceDomain = $('#customfield_10223-val').text().trim();
-            const rawLog = $('#field-customfield_10219 > div:first-child > div:nth-child(2)').text().trim().split('\n');
+
             const handler = handlers[DecoderName];
             if (handler) {
                 handler();
