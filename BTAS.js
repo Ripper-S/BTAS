@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.4.4
+// @version      1.4.6
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
@@ -208,12 +208,9 @@ function editNotify() {
         'lsh-hk':
             'Please escalated according to the Label tags and document.<br>\
         http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
-        'plwazag':
-            'When processing a ticket containing "plwazag" in the Log Source<br>\
-        Please do NOT escalate to the customer and contact Dev Team via Teams Conversation first to confirm if it is due to their operatation',
-        'LogCollector':
-            'When processing a ticket containing "LogCollector" in the Log Source<br>\
-        Please do NOT escalate to the customer and contact Dev Team via Teams Conversation first to confirm if it is due to their operatation'
+        'Dev Team':
+            'Please do NOT escalate to the customer<br>\
+        AND contact Dev Team via Teams Conversation first to confirm if it is due to their operatation'
     };
     const LogSourceDomain = $('#customfield_10223-val').text().trim();
     const Labels = $('.labels-wrap .labels li a span').text();
@@ -255,15 +252,17 @@ function editNotify() {
             }
         }
         // # Add a click event listener to the "Edit" button related to the "LogSource" field
-        if (LogSource.includes('plwazag') || LogSource.includes('LogCollector')) {
-            const keyLS = LogSource.includes('plwazag') ? 'plwazag' : LogSource;
-            const orgNotify = orgNotifydict[keyLS];
+        if (
+            LogSource.includes('plwazag') ||
+            LogSource.includes('LogCollector') ||
+            LogSource.includes('.int.darklab.hk')
+        ) {
+            const orgNotify = orgNotifydict['Dev Team'];
             $('#edit-issue').on('click', () => {
-                showFlag('warning', `${keyLS} ticket`, `${orgNotify}`, 'manual');
+                showFlag('warning', `${LogSource} ticket`, `${orgNotify}`, 'manual');
             });
         }
     }
-
     addEditonClick();
 
     function generateEditnotify() {
@@ -830,10 +829,8 @@ function WineventAlertHandler() {
 
     // Issue page: Alert Handler
     setInterval(() => {
-        if ($('#issue-content').length && !$('#generateDescription').length && !$('.aui-banner-error').length) {
+        if ($('#issue-content').length && !$('#generateDescription').length) {
             console.log('#### Code Issue page: Alert Handler ####');
-            checkKeywords();
-
             const handlers = {
                 'cortex-xdr-json': cortexAlertHandler,
                 'mde-api-json': MDEAlertHandler,
@@ -847,6 +844,14 @@ function WineventAlertHandler() {
             if (handler) {
                 handler();
             }
+        }
+    }, 3000);
+
+    // Issue page: check Keywords
+    setInterval(() => {
+        if ($('#issue-content').length && !$('.aui-banner-error').length) {
+            console.log('#### Code Issue page: check Keywords ####');
+            checkKeywords();
         }
     }, 3000);
 
