@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.4.2
+// @version      1.4.3
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
@@ -222,7 +222,7 @@ function editNotify() {
             LogSourceDomain.includes('esf') ||
             LogSourceDomain.includes('swireproperties') ||
             LogSourceDomain.includes('lsh-hk') ||
-            LogSourceDomain.includes('plwazag')
+            LogSource.includes('plwazag')
         ) {
             $('#edit-issue').on('click', () => {
                 showFlag('warning', `${LogSourceDomain} ticket`, `${orgNotify}`, 'manual');
