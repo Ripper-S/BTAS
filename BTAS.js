@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.4.1
+// @version      1.4.3
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
@@ -207,7 +207,10 @@ function editNotify() {
         Check if additional Participants need to be added through HK_MSS_SOP.doc',
         'lsh-hk':
             'Please escalated according to the Label tags and document.<br>\
-        http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk'
+        http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
+        'plwazag':
+            'When processing a ticket containing "plwazag" in the Log Source<br>\
+        Please do NOT escalate to the customer and contact Dev Team via Teams Conversation first to confirm if it is due to their operatation'
     };
     const LogSourceDomain = $('#customfield_10223-val').text().trim();
     const orgNotify = orgNotifydict[LogSourceDomain];
@@ -218,7 +221,8 @@ function editNotify() {
         if (
             LogSourceDomain.includes('esf') ||
             LogSourceDomain.includes('swireproperties') ||
-            LogSourceDomain.includes('lsh-hk')
+            LogSourceDomain.includes('lsh-hk') ||
+            LogSource.includes('plwazag')
         ) {
             $('#edit-issue').on('click', () => {
                 showFlag('warning', `${LogSourceDomain} ticket`, `${orgNotify}`, 'manual');
