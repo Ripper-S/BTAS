@@ -112,11 +112,13 @@ function createNotifyControls() {
         parentNode.prepend(audioControl);
     }
 
-    function createCheckbox(parentNode, localStorageKey) {
+    function createCheckbox(parentNode, localStorageKey, checkStatus) {
         const checkbox = $('<span></span>');
         const value = localStorage.getItem(localStorageKey);
         checkbox.html(
-            `<input type="checkbox" name="${localStorageKey}" ${value == 'true' ? 'checked' : ''}>${localStorageKey}`
+            `<input type="checkbox" name="${localStorageKey}" ${
+                value == 'true' ? 'checked' : checkStatus ? 'checked' : ''
+            }>${localStorageKey}`
         );
         checkbox.find('input').on('click', () => {
             localStorage.setItem(localStorageKey, checkbox.find('input').prop('checked'));
@@ -125,9 +127,9 @@ function createNotifyControls() {
         return checkbox;
     }
     createAudioControl(operationsBar);
-    const audioCheckbox = createCheckbox(operationsBar, 'audioNotify');
-    const keepCheckbox = createCheckbox(operationsBar, 'keepAudio');
-    const promptCheckbox = createCheckbox(operationsBar, 'prompt');
+    const audioCheckbox = createCheckbox(operationsBar, 'audioNotify', false);
+    const keepCheckbox = createCheckbox(operationsBar, 'keepAudio', false);
+    const promptCheckbox = createCheckbox(operationsBar, 'prompt', true);
 
     return { audioControl, audioCheckbox, keepCheckbox, promptCheckbox };
 }
@@ -486,7 +488,9 @@ function MDEAlertHandler() {
     function parseLog(rawLog) {
         const alertInfo = rawLog.reduce((acc, log) => {
             try {
-                const { mde } = JSON.parse(log);
+                const formatJson = log.substring(log.indexOf('{')).trim();
+                const logObj = JSON.parse(formatJson.replace(/\\\(n/g, '\\n('));
+                const { mde } = logObj;
                 const { title, id, computerDnsName, relatedUser, evidence } = mde;
                 const alert = { title, id, computerDnsName };
                 const userName = relatedUser ? relatedUser.userName : 'N/A';
