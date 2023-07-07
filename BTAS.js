@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.4.6
+// @version      1.4.7
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
