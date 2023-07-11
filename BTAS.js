@@ -2,7 +2,7 @@
 // @name         BTAS
 // @namespace    https://github.com/Ripper-S/BTAS
 // @homepageURL  https://github.com/Ripper-S/BTAS
-// @version      1.4.7
+// @version      1.4.8
 // @description  Blue Team Assistance Script
 // @author       Barry Y Yang; Jack SA Chen; Xingyu X Zhou
 // @license      Apache-2.0
@@ -204,19 +204,20 @@ function checkKeywords() {
 function editNotify() {
     console.log('#### Code editNotify run ####');
     const orgNotifydict = {
-        'esf': 'Please escalated according to the Label tags and document.<br>\
-        https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping',
-        'swireproperties':
-            'Please escalated according to the group, hostname value.<br>\
-        Check if additional Participants need to be added through HK_MSS_SOP.doc',
-        'lsh-hk':
-            'Please escalated according to the Label tags and document.<br>\
-        http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
         'Dev Team':
             'Please do NOT escalate to the customer<br>\
-        AND contact Dev Team via Teams Conversation first to confirm if it is due to their operatation',
+            AND contact Dev Team via Teams Conversation first to confirm if it is due to their operatation',
+        'esf': 'Please escalated according to the Label tags and document.<br>\
+            https://172.18.2.13/books/customers/page/esf-cortex-endpoint-group-jira-organization-mapping',
+        'swireproperties':
+            'Please escalated according to the group, hostname value.<br>\
+            Check if additional Participants need to be added through HK_MSS_SOP.doc',
+        'lsh-hk':
+            'Please escalated according to the Label tags and document.<br>\
+            http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
         'toysrus':
-            'If the alert is related to Malicious or Unwanted software, there is NO NEED to escalate.<br> Please help the customer run full scan on MDE and then close ticket. Finally, add full scan screenshots in internal comments'
+            'If the alert is related to Malicious or Unwanted software, there is NO NEED to escalate.<br>\
+            Please help the customer run full scan on MDE and then close ticket. Finally, add full scan screenshots in internal comments'
     };
     const LogSourceDomain = $('#customfield_10223-val').text().trim();
     const Labels = $('.labels-wrap .labels li a span').text();
