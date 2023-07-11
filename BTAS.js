@@ -214,7 +214,9 @@ function editNotify() {
         http://172.18.2.13/books/customers/page/lsh-hk-lei-shing-hong-hk',
         'Dev Team':
             'Please do NOT escalate to the customer<br>\
-        AND contact Dev Team via Teams Conversation first to confirm if it is due to their operatation'
+        AND contact Dev Team via Teams Conversation first to confirm if it is due to their operatation',
+        'toysrus':
+            'If the alert is related to Malicious or Unwanted software, there is NO NEED to escalate.<br> Please help the customer run full scan on MDE and then close ticket. Finally, add full scan screenshots in internal comments'
     };
     const LogSourceDomain = $('#customfield_10223-val').text().trim();
     const Labels = $('.labels-wrap .labels li a span').text();
@@ -224,7 +226,8 @@ function editNotify() {
         if (
             LogSourceDomain.includes('esf') ||
             LogSourceDomain.includes('swireproperties') ||
-            LogSourceDomain.includes('lsh-hk')
+            LogSourceDomain.includes('lsh-hk') ||
+            LogSourceDomain.includes('toysrus')
         ) {
             const orgNotify = orgNotifydict[LogSourceDomain];
             $('#edit-issue').on('click', () => {
